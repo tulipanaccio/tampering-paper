@@ -1,0 +1,23 @@
+il dataset utilizzato consiste in 9 scenari differenti, con eventi di tampering reali o simulati.
+
+BuenosAires	|
+SanBabila	| Prese da webcam su internet
+FulvioTesti	|
+NY3		|
+
+DEIB1		|
+DEIB2		|
+Giostra		| Acquisite con Raspberry Pi
+Piazza		|
+Via Bassini	|
+
+Defocus sintetico in tutte le sequenze con filtri gaussiani (sigma = 1, ... , 10) 
+	10 frame tamperati per ciascuna sequenza: totale 90 eventi di defocus
+
+Displacement: reale in 5 sequenze; le restanti 4 con concatenazione
+	in 2 sequenze con tampering reale (FulvioTesti e NY3) i frame tamperati sono 3 e vengono replicati per avere 10 		eventi per ciascuna sequenza	
+	In totale sono 90 eventi di displacement
+
+ 
+	
+	
