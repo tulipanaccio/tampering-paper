@@ -1,43 +1,92 @@
 \documentclass{llncs}
 
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
 \usepackage{graphicx}
-%\usepackage{algorithm2e}
-%\usepackage{tabularx}
-%\usepackage{url}
-%\usepackage{subfigure}
-%\usepackage{afterpage}
-%\usepackage{amsmath,amssymb}            
-%\usepackage{rotating}  
-%\usepackage{fancyhdr}  
-%\usepackage[scriptsize]{caption} 
-%
+\usepackage[ruled]{algorithm2e}
+%\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{amssymb}
+\usepackage{amsmath,graphicx,color,doi}
+\usepackage{algorithm2e}
+%\usepackage{algorithmic}	
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{cite}
+
+
+\newcommand{\gi}[1]{{\textcolor{red}{[\small \textbf{Giacomo}: #1]}}}
+\newcommand{\ad}[1]{{\textcolor{red}{[\small \textbf{Adriano}: #1]}}}
+\newcommand{\cl}[1]{{\textcolor{red}{[\small \textbf{Claudio}: #1]}}}
+
 \begin{document}
 \title{Tampering detection for low-power smart camera}
 
-\author{Author 1, Author 2}
+\author{Adriano Gaibotti\inst{1} \and Claudio Marchisio\inst{1} \and Alexandro Sentinelli\inst{1} \and Giacomo Boracchi\inst{2}}
 
-\institute{Politecnico di Milano}
+\institute{ STMicroelectronics, Advanced System Technology, Via Camillo Olivetti 2, 20864, Agrate Brianza (MB), Italy\\
+	\email{\{adriano.gaibotti, claudio.marchisio, alexandro.sentinelli\}@st.com}
+	\and
+	Politecnico di Milano, Dipartimento di Elettronica, Informazione e Bioingegneria (DEIB), Via Ponzio 34/5, 20133, Milano (MI), Italy\\
+	\email{giacomo.boracchi@polimi.it}}
 \maketitle
 
 \begin{abstract}
-	
-	Abstract is here.
-	
+\gi{Adriano: riesci a mettere bene gli autori con le affiliation distinte per bene? Poi domani sento Alex per capire che vuole fare}
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
 
-Introduction is here.
+\gi{Adriano: metti un paio di foto per spiegare il problema che consideriamo.}
 
-\section{Related works}\label{sec:relWorks}
+Random Toughs:
+\begin{itemize}
+\item Smart cameras, low-power monitoring of scene. Description of the application scenario. Low frame rate.
+\item Cameras organized in a multimedia network, continuous acquisition and streaming is not feasible
+\item The problem of false alarms, radio module activation
+\item Other tampering attacks like obfuscation (??) which might be due to environmental phenomena such as rain, fog and mist over the camera lenses have to be detected by image analysis methods
+\item Displacement can be perceived by MEMS as well but these device alone are prone to false alarms. Visual inspection is necessary to reduce false alarms
+\item constrained environment: algorithms have to operate with a low computational complexity and memory requirement
+\end{itemize}
 
-Other sections are here. 
+ 
+\section{Related Works}\label{sec:relWorks}
 
-\section{Problem formulation}\label{sec:probForm}
+\gi{Adriano: metti tutte le reference, ciascuna con un commento di una frase per dire che fa ed una frase (o mezza) per dire i problemi che ha (con particolare riferimento all'ambito low-power) Poi le aggiustiamo in maniera organica}
 
-\section{Proposed solution}\label{sec:propSol}
+\section{Problem Formulation}\label{sec:probForm}
+
+\gi{Adriano: metti le formule di quello della tesi circa displacemente e out of focus. Poi condensiamo il tutto}
+
+\section{Proposed Solution}\label{sec:propSol}
+
+\subsection{Scene Segmentation}\label{subsec:Segmentation}
+
+\subsection{Indicators}\label{subsec:Indicators}
+\gi{Adriano: mettere formule degli indicatori e anche del frame difference qua}
+
+\subsection{Outlier Detection}\label{subsec:MonitoringScheme}
+
+\subsection{Algorithm Summary}\label{subsec:AlgorithmSummary}
+
+\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
+
+\subsection{Dataset Description}\label{subsec:Dataset}
+\gi{Adriano: Prova a mettere qua le info}
+
+\subsection{Alternative Approaches}\label{subsec:AlternativeApproach	es}
+\begin{itemize}
+\item Full
+\item Adaptive Region
+\item Voronoi Regions
+\end{itemize}
+
+\subsection{Performance Assessment}
+\gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
+
+\gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
+
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus_cropped.pdf}
@@ -45,14 +94,15 @@ Other sections are here.
 \label{fig:ROCdefocus}
 \end{figure}
 
+\subsection{Discussion}
+\gi{Adiano: Aggiungi qua la complessit\'a computazionale}
 
 \section{Conclusion}\label{sec:Conclusion}
-
-Conclusions are here \cite{aksay2007camera}.
+\gi{Adriano: butta in inglese gli ongoing works (come ultima cosa)}
+\cite{aksay2007camera}.
 
 \section*{Acknowledgments}\label{sec:Acknowledgments}
-
-Authors would like to thank YYYYY.
+Authors would like to thank ST for supporting Adriano Gaibotti.
 
 \bibliographystyle{unsrt}
 \bibliography{bibl_tesi}
