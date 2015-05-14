@@ -31,7 +31,10 @@
 \maketitle
 
 \begin{abstract}
-\gi{Adriano: riesci a mettere bene gli autori con le affiliation distinte per bene? Poi domani sento Alex per capire che vuole fare}
+One of the most critical issues in smart cameras, used as nodes in wireless multimedia sensor networks (WMSN), is the automatic detection of events that could compromise the correct acquisition of the scene, such as the presence of water on the camera lens, or the displacement of the device, or tampering events. 
+In general, techniques used to identify these type of events are called tampering detection algorithms.
+We introduce a solution for the tampering detection that can be used for low-power and embedded smart cameras, in which the acquisition is done with low frame rate, such as one frame every minute.
+
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
@@ -67,7 +70,79 @@ Random Toughs:
 \subsection{Outlier Detection}\label{subsec:MonitoringScheme}
 
 \subsection{Algorithm Summary}\label{subsec:AlgorithmSummary}
+\begin{algorithm}[tp]
+	% \SetAlgoNoLine
+	\LinesNumbered
+	\SetAlgoNlRelativeSize{0}
+	\SetNlSty{small}{}{.}
+	\textbf{Configuration}:\\
+	\lnl{DEF-Tr0} Extract regions $\{R_k\}, k=1,\dots,K$  \\
+	\lnl{DEF-Tr1} \For{$t=1,\dots,T_{o}$}
+	{	\lnl{DEF-Tr2} Acquire frame $z_t$ \\
+		\lnl{DEF-Tr2a} \For{$k=1,\dots,K$}{
+			\lnl{DEF-Tr3a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
+		}
+		\lnl{DEF-Tr3} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
+	}
+	\lnl{DEF-Tr6a} \For{$k=1,\dots,K$}{
+		\lnl{DEF-Tr7a} Define thresholds $\Gamma_{min}^k$ and $\Gamma_{max}^k$\\
+	}
+	\lnl{DEF-Tr5} Define CDT parameters on $g(t)$ variance\\
+	\textbf{Operational phase}:\\
+	\lnl{DEF-Test1} \For{$t=T_{o},\dots,\infty$}{
+		\lnl{DEF-Test2} Acquire frame $z_t$ \\
+		\lnl{DEF-Tr3b} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
+		\lnl{DEF-Test2a} $n=0$\\
+		\lnl{DEF-Test4a} \For{$k=1,\dots,K$}{
+			\lnl{DEF-Test5a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
+			\lnl{DEF-Test6a} \If{$\frac{\partial g^k}{\partial t}(t) < \Gamma_{min}^k \vee \frac{\partial g^k}{\partial t}(t) > \Gamma_{max}^k $}{
+				\lnl{DEF-Test7a} $n=n+1$\\
+			}
+		}
+		\lnl{DEF-Test81} \If{$n \geq K-1$}{
+			\lnl{DEF-Test91} $z_t$ is a defocused frame\\
+		}
+		\lnl{DEF-Test8} \If{CDT detect a change on $g(t)$ variance}{
+			\lnl{DEF-Test9} $z_t$ is a defocused frame\\
+		}
+	}   
+	\caption{Blur detection algorithm}
+	\label{alg:DEFOCUS}
+\end{algorithm}
 
+\begin{algorithm}[tp]
+	% \SetAlgoNoLine
+	\LinesNumbered
+	\SetAlgoNlRelativeSize{0}
+	\SetNlSty{small}{}{.}
+	\textbf{Configuration}:\\
+	\lnl{DISPL-Tr1} Extract regions $\{R_k\}, k=1,\dots,K$  \\
+	\lnl{DISPL-Tr2} \For{$t=1,\dots,T_{o}$}
+	{	\lnl{DISPL-Tr3} Acquire frame $z_t$ \\
+		\lnl{DISPL-Tr4} \For{$k=1,\dots,K$}{
+			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\frac{\partial l^k}{\partial t}(t)$ for the region $R_k$\\
+		}
+	}
+	\lnl{DISPL-Tr6} \For{$k=1,\dots,K$}{
+		\lnl{DISPL-Tr7} Define thresholds $\Gamma_{min}^k$ and $\Gamma_{max}^k$\\
+	}
+	\textbf{Operational phase}:\\
+	\lnl{DISPL-Test1} \For{$t=T_{o},\dots,\infty$}{
+		\lnl{DISPL-Test2} Acquire frame $z_t$ \\
+		\lnl{DISPL-Test3} $n = 0$ \\
+		\lnl{DISPL-Test4} \For{$k=1,\dots,K$}{
+			\lnl{DISPL-Test5} Compute $l^k(t)$, $\frac{\partial l^k}{\partial t}(t)$ for the region $R_k$\\
+			\lnl{DISPL-Test6} \If{$\frac{\partial l^k}{\partial t}(t) < \Gamma_{min}^k \vee \frac{\partial l^k}{\partial t}(t) > \Gamma_{max}^k $}{
+				\lnl{DISPL-Test7} $n=n+1$\\
+			}
+		}
+		\lnl{DISPL-Test8} \If{$n\geq K-1$}{
+			\lnl{DISPL-Test9} $z_t$ is a displaced frame\\
+		}
+	}   
+	\caption{Displacement detection algorithm}
+	\label{alg:DISPL}
+\end{algorithm}
 \gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
