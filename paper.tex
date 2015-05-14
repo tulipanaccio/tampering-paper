@@ -19,27 +19,39 @@
 \newcommand{\cl}[1]{{\textcolor{red}{[\small \textbf{Claudio}: #1]}}}
 
 \begin{document}
-\title{Tampering detection for low-power smart camera}
+\title{Tampering detection for low-power smart cameras}
 
-\author{Adriano Gaibotti\inst{1} \and Claudio Marchisio\inst{1} \and Alexandro Sentinelli\inst{1} \and Giacomo Boracchi\inst{2}}
+\author{Adriano Gaibotti\inst{1}\inst{2} \and Claudio Marchisio\inst{1} \and Alexandro Sentinelli\inst{1} \and Giacomo Boracchi\inst{2}}
 
 \institute{ STMicroelectronics, Advanced System Technology, Via Camillo Olivetti 2, 20864, Agrate Brianza (MB), Italy\\
 	\email{\{adriano.gaibotti, claudio.marchisio, alexandro.sentinelli\}@st.com}
 	\and
 	Politecnico di Milano, Dipartimento di Elettronica, Informazione e Bioingegneria (DEIB), Via Ponzio 34/5, 20133, Milano (MI), Italy\\
-	\email{giacomo.boracchi@polimi.it}}
+	\email{adriano.gaibotti@mail.polimi.it, giacomo.boracchi@polimi.it}}
 \maketitle
 
 \begin{abstract}
 One of the most critical issues in smart cameras, used as nodes in wireless multimedia sensor networks (WMSN), is the automatic detection of events that could compromise the correct acquisition of the scene, such as the presence of water on the camera lens, or the displacement of the device, or tampering events. 
 In general, techniques used to identify these type of events are called tampering detection algorithms.
 We introduce a solution for the tampering detection that can be used for low-power and embedded smart cameras, in which the acquisition is done with low frame rate, such as one frame every minute.
+The solution consists in a segmentation of the acquired scene in adaptive regions, and monitoring some features in each region, in order to find a change in their behavior that could be associated to a tampering event.
 
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
 
 \gi{Adriano: metti un paio di foto per spiegare il problema che consideriamo.}
+
+
+
+\begin{figure}
+\centering
+\subfigure[]{\label{fig:neve} \includegraphics[width=0.4\linewidth]{Immagini/neve}}
+\subfigure[]{\label{fig:pioggia} \includegraphics[width=0.4\linewidth]{Immagini/pioggia}}
+\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
+\label{fig:tampering}
+\end{figure}
+
 
 Random Toughs:
 \begin{itemize}
@@ -55,6 +67,22 @@ Random Toughs:
 \section{Related Works}\label{sec:relWorks}
 
 \gi{Adriano: metti tutte le reference, ciascuna con un commento di una frase per dire che fa ed una frase (o mezza) per dire i problemi che ha (con particolare riferimento all'ambito low-power) Poi le aggiustiamo in maniera organica}
+
+\cite{aksay2007camera}: uses background subtraction methods in order to identify defocus and occlusions, doing a comparison in the wavelet domain for defocus detection and histogram comparison  for occlusion detection. Displacement is not treated.
+
+\cite{saglam2009real}:  uses background subtraction methods in order to identify defocus, occlusions, and displacements. Comparison in the Fourier domain for defocus detection, histogram comparison for occlusion detection, comparison between current background and delayed background for displacement detection.
+
+\cite{alippi2010detecting}: CUSUM CDT on gradient energy content in order to detect blur in frames 
+
+\cite{gil2007automatic}:  uses background subtraction methods in order to identify defocus, occlusions, and displacements. Comparison of edges pixels count for defocus detection, entropy comparison for occlusion detection, block matching algorithm for displacement detection.
+
+\cite{ribnick2006real}: comparison between frames belonging to a buffer in order to find high values of dissimilarity, associated to tampering.
+
+\cite{kryjak2012fpga}: implementation in a FPGA of a solution based on background modeling, histograms comparisons, edges comparisons.
+
+\cite{harasse2004automated}: tampering detection inside a moving vehicle; uses background subtraction methods in order to identify defocus, occlusions, and displacements. Comparison of edges pixels count for defocus detection, entropy comparison for occlusion detection, block matching algorithm for displacement detection.
+
+\cite{tsesmelis2013tamper}: monitoring of the number of key points extracted by SURF in order to detect defocus events, partition in blocks and HOG descriptors matching for each block in order to detect occlusions. These types of solutions requires a lot of computations
 
 \section{Problem Formulation}\label{sec:probForm}
 
@@ -163,18 +191,29 @@ Random Toughs:
 \gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
 
 \begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus_cropped.pdf}
-\caption{Defocus}
-\label{fig:ROCdefocus}
+	\centering
+	\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus.pdf}}
+	\subfigure[]{\label{fig:ROCdefocusZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocusZOOM.pdf}}
+	\subfigure[]{\label{fig:ROCdispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement.pdf}}
+	\subfigure[]{\label{fig:ROCdisplZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacementZOOM.pdf}}
+	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
+	\label{fig:ROC}
 \end{figure}
+
+
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus_cropped.pdf}
+%\caption{Defocus}
+%\label{fig:ROCdefocus}
+%\end{figure}
 
 \subsection{Discussion}
 \gi{Adiano: Aggiungi qua la complessit\'a computazionale}
 
 \section{Conclusion}\label{sec:Conclusion}
 \gi{Adriano: butta in inglese gli ongoing works (come ultima cosa)}
-\cite{aksay2007camera}.
+.
 
 \section*{Acknowledgments}\label{sec:Acknowledgments}
 Authors would like to thank ST for supporting Adriano Gaibotti.
