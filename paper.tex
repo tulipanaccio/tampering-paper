@@ -33,10 +33,13 @@
 \begin{abstract}
 One of the most critical issues in smart cameras, used as nodes in wireless multimedia sensor networks (WMSN), is the automatic detection of events that could compromise the correct acquisition of the scene, such as the presence of water on the camera lens, or the displacement of the device, or tampering events. 
 In general, techniques used to identify these type of events are called tampering detection algorithms.
-We introduce a solution for the tampering detection that can be used for low-power and embedded smart cameras, in which the acquisition is done with low frame rate, such as one frame every minute.
+We introduce a solution for the tampering detection issue which can be used for low-power and embedded smart cameras, in which the acquisition is done with low frame rate, such as one frame every minute.
 The solution consists in a segmentation of the acquired scene in adaptive regions, and monitoring some features in each region, in order to find a change in their behavior that could be associated to a tampering event.
-
+Experiments show that our solution increase the performances with respect to monitoring the whole scene, with low computational complexity.
+\keywords{tampering, defocus, displacement, segmentation, gradient}
 \end{abstract}
+
+
 
 \section{Introduction}\label{sec:introduction}
 
@@ -88,16 +91,153 @@ Random Toughs:
 
 \gi{Adriano: metti le formule di quello della tesi circa displacemente e out of focus. Poi condensiamo il tutto}
 
+
+\begin{equation}
+\label{eq:blur_single}
+z(x)=\mathcal{D}[y](x) = \mathcal{B}[y](x) + \eta(x), \qquad x \in \mathcal{X}
+\end{equation}
+
+
+\begin{equation}
+\label{eq:blur}
+\mathcal{B}[y](x) = \int_{\mathcal{X}}y(s)h(x,s)ds,
+\end{equation}
+
+
+\begin{equation}
+\label{eq:blur_convolution}
+\mathcal{B}[y](x) = \int_{\mathcal{X}}y(s)h(s-x)ds,
+\end{equation}
+
+\begin{equation}
+\label{eq:blur_multi}
+z_t(x)=\mathcal{D}_t[y_t](x) = \mathcal{B}_t[y_t](x) + \eta(x), \qquad x \in \mathcal{X}.
+\end{equation}
+
+\begin{equation}
+\label{eq:displacement}
+z_t(x)  = \left\{ \begin{array}{rcl}
+y_t(x) + \eta(x) & \mbox{per} & t < T^* \\
+w_t(x) + \eta(x) & \mbox{per} & t \geqslant T^*
+\end{array}\right. ,
+\end{equation}
+
+
+Per $t<T^*$ abbiamo che i frame vengono acquisiti in condizioni di funzionamento normale:
+\[ z_t(x)=y_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t=1,\dots , T^*-1. \] 
+All'istante di tempo $t = T^*$ avviene un evento di tampering, il quale compromette i frame per $t\geq T^*$.  
+In particolare, nel caso di una sfocatura avremo
+\[ z_t = \mathcal{B}_t[y_t](x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*,\]
+mentre nel caso di uno spostamento della camera avremo
+\[ z_t = w_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*. \]
+
+
+
 \section{Proposed Solution}\label{sec:propSol}
+
+
+
 
 \subsection{Scene Segmentation}\label{subsec:Segmentation}
 
 \subsection{Indicators}\label{subsec:Indicators}
 \gi{Adriano: mettere formule degli indicatori e anche del frame difference qua}
 
+\begin{equation}
+\label{eq:energyGradient}
+g(t) = \mathcal{G}[z_t] =\frac{\sum_{\mathcal{X}}\| \nabla z_t(x) \| _2^2 }{|\mathcal{X}|} ,
+\end{equation}  
+
+In particolare, per il calcolo delle derivate orizzontali  abbiamo utilizzato il seguente filtro $f_h$:
+\[f_h = f \circledast \left[ \begin{array}{rcl}
+1 & 0 & -1
+\end{array}\right], \] 
+mentre per il calcolo delle derivate verticali abbiamo utilizzato il seguente filtro $f_v$:
+\[f_v = f \circledast \left[ \begin{array}{r}
+1 \\ 0 \\ -1
+\end{array}\right], \]
+dove abbiamo indicato con $\circledast$ l'operatore di convoluzione.
+Il filtro $f$, invece, \`e ottenuto tramite un campionamento della \textit{funzione gaussiana} $h$, con media $0$ e deviazione standard $\sigma$
+\begin{equation}
+\label{eq:gaussian}
+h(i,j)=\frac{1}{2\pi\sigma^2}\exp\left(-\frac{i^2+j^2}{2\sigma^2}\right),
+\end{equation}
+e ponendo il valore massimo di questa funzione nel centro del filtro.
+Con questi filtri \`e possibile calcolare la \textit{norma del gradiente} nel seguente modo:
+\begin{equation}
+\label{eq:normaGradiente}
+\| \nabla z_t(x) \|_2^2=\left(z_t \circledast f_h\right)(x)^2 + \left(z_t \circledast f_v\right)(x)^2.
+\end{equation}
+Una volta calcolata la norma del gradiente \`e possibile farne la media come specificato in \eqref{eq:energyGradient}.
+Il risultato finale \`e un indicatore \textit{scalare} per ciascun frame acquisito, che pu\`o essere monitorato per individuare eventi di sfocature. 
+In particolare ci aspettiamo che l'evento di sfocatura provochi un abbattimento del valore di $g$.
+
+
+
+\begin{equation}
+\label{eq:energyLuma}
+l(t) = \mathcal{L}[z_t] =\frac{\sum_{\mathcal{X}} z_t(x) }{|\mathcal{X}|} ,
+\end{equation}  
+
+
+\begin{equation}
+\label{eq:gradientDetr}
+\frac{\partial g}{\partial t}(t) = g(t) - g(t-1),
+\end{equation}
+
+
+\begin{equation}
+\label{eq:lumaDetr}
+\frac{\partial l}{\partial t}(t) = l(t) - l(t-1).
+\end{equation}
+
+
 \subsection{Outlier Detection}\label{subsec:MonitoringScheme}
 
+
+
+\begin{equation}
+\label{eq:soglieGradiente}
+\begin{array}{lcl}
+\Gamma_{min}^k & = & \hat{\mu}_g^k -\gamma \hat{\sigma}_g^k\\
+\Gamma_{max}^k & = & \hat{\mu}_g^k + \gamma \hat{\sigma}_g^k
+\end{array},
+\end{equation}
+dove $\hat{\mu}_g^k$ indica il valore medio delle osservazioni del training set
+\begin{equation}
+\hat{\mu}_g^k = \frac{\sum_{\tau = 1}^{T_{o}} \frac{\partial g^k}{\partial t}(\tau)}{T_{o}}, \nonumber
+\end{equation}
+$\hat{\sigma}_g^k$ indica la deviazione standard delle osservazioni del training set
+\begin{equation}
+\hat{\sigma}_g^k  = \sqrt{\frac{1}{T_{o}-1}\sum_{\tau=1}^{T_{o}}\left(\frac{\partial g^k}{\partial t}(\tau) - \hat{\mu}_g^k(\tau)\right)^2} \nonumber
+\end{equation}
+e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
+
+\begin{equation}
+\label{eq:soglieLuma}
+\begin{array}{rcl}
+\Gamma_{min}^k & = & \hat{\mu}_l^k -\gamma \hat{\sigma}_l^k\\
+\Gamma_{max}^k & = & \hat{\mu}_l^k + \gamma \hat{\sigma}_l^k
+\end{array},
+\end{equation}
+dove $\hat{\mu}_l^k$ indica il valore medio delle osservazioni del training set
+\begin{equation}
+\hat{\mu}_l^k = \frac{\sum_{\tau = 1}^{T_{o}} \frac{\partial l^k}{\partial t}(\tau)}{T_{o}}, \nonumber
+\end{equation}
+$\hat{\sigma}_l^k$ indica la deviazione standard delle osservazioni del training set
+\begin{equation}
+\hat{\sigma}_l^k  = \sqrt{\frac{1}{T_{o}-1}\sum_{\tau=1}^{T_{o}}\left(\frac{\partial l^k}{\partial t}(\tau) - \hat{\mu}_l^k(\tau)\right)^2} \nonumber
+\end{equation}
+e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
+
+
+
+
+
 \subsection{Algorithm Summary}\label{subsec:AlgorithmSummary}
+
+
+
 \begin{algorithm}[tp]
 	% \SetAlgoNoLine
 	\LinesNumbered
