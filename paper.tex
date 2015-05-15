@@ -146,9 +146,12 @@ mentre nel caso di uno spostamento della camera avremo
 \gi{Adriano: mettere formule degli indicatori e anche del frame difference qua}
 
 \begin{equation}
-\label{eq:energyGradient}
-g(t) = \mathcal{G}[z_t] =\frac{\sum_{\mathcal{X}}\| \nabla z_t(x) \| _2^2 }{|\mathcal{X}|} ,
-\end{equation}  
+\label{eq:gradientRegions}
+\begin{array}{ccc}
+g^k(t)&  = & \mathcal{G}^k[z_t] = \frac{\sum_{\mathcal{R}_k}\| \nabla z_t(x) \| _2^2 }{|{\mathcal{R}_k}|}\\
+\partial g^k(t) & =& g^k(t)-g^k(t-1) 
+\end{array},
+\end{equation}
 
 In particolare, per il calcolo delle derivate orizzontali  abbiamo utilizzato il seguente filtro $f_h$:
 \[f_h = f \circledast \left[ \begin{array}{rcl}
@@ -174,6 +177,15 @@ Una volta calcolata la norma del gradiente \`e possibile farne la media come spe
 Il risultato finale \`e un indicatore \textit{scalare} per ciascun frame acquisito, che pu\`o essere monitorato per individuare eventi di sfocature. 
 In particolare ci aspettiamo che l'evento di sfocatura provochi un abbattimento del valore di $g$.
 
+
+
+\begin{equation}
+\label{eq:lumaRegions}
+\begin{array}{ccc}
+l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{\mathcal{R}_k} z_t(x) }{|{\mathcal{R}_k}|}\\
+\partial l^k(t) & =& l^k(t)-l^k(t-1) 
+\end{array},
+\end{equation}
 
 
 \begin{equation}
@@ -240,77 +252,78 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 
 
 
-\begin{algorithm}[tp]
-	% \SetAlgoNoLine
-	\LinesNumbered
-	\SetAlgoNlRelativeSize{0}
-	\SetNlSty{small}{}{.}
-	\textbf{Configuration}:\\
-	\lnl{DEF-Tr0} Extract regions $\{R_k\}, k=1,\dots,K$  \\
-	\lnl{DEF-Tr1} \For{$t=1,\dots,T_{o}$}
-	{	\lnl{DEF-Tr2} Acquire frame $z_t$ \\
-		\lnl{DEF-Tr2a} \For{$k=1,\dots,K$}{
-			\lnl{DEF-Tr3a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
-		}
-		\lnl{DEF-Tr3} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
-	}
-	\lnl{DEF-Tr6a} \For{$k=1,\dots,K$}{
-		\lnl{DEF-Tr7a} Define thresholds $\Gamma_{min}^k$ and $\Gamma_{max}^k$\\
-	}
-	\lnl{DEF-Tr5} Define CDT parameters on $g(t)$ variance\\
-	\textbf{Operational phase}:\\
-	\lnl{DEF-Test1} \For{$t=T_{o},\dots,\infty$}{
-		\lnl{DEF-Test2} Acquire frame $z_t$ \\
-		\lnl{DEF-Tr3b} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
-		\lnl{DEF-Test2a} $n=0$\\
-		\lnl{DEF-Test4a} \For{$k=1,\dots,K$}{
-			\lnl{DEF-Test5a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
-			\lnl{DEF-Test6a} \If{$\frac{\partial g^k}{\partial t}(t) < \Gamma_{min}^k \vee \frac{\partial g^k}{\partial t}(t) > \Gamma_{max}^k $}{
-				\lnl{DEF-Test7a} $n=n+1$\\
-			}
-		}
-		\lnl{DEF-Test81} \If{$n \geq K-1$}{
-			\lnl{DEF-Test91} $z_t$ is a defocused frame\\
-		}
-		\lnl{DEF-Test8} \If{CDT detect a change on $g(t)$ variance}{
-			\lnl{DEF-Test9} $z_t$ is a defocused frame\\
-		}
-	}   
-	\caption{Blur detection algorithm}
-	\label{alg:DEFOCUS}
-\end{algorithm}
+%\begin{algorithm}[tp]
+%	% \SetAlgoNoLine
+%	\LinesNumbered
+%	\SetAlgoNlRelativeSize{0}
+%	\SetNlSty{small}{}{.}
+%	\textbf{Configuration}:\\
+%	\lnl{DEF-Tr0} Extract regions $\{R_k\}, k=1,\dots,K$  \\
+%	\lnl{DEF-Tr1} \For{$t=1,\dots,T_{o}$}
+%	{	\lnl{DEF-Tr2} Acquire frame $z_t$ \\
+%		\lnl{DEF-Tr2a} \For{$k=1,\dots,K$}{
+%			\lnl{DEF-Tr3a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
+%		}
+%		\lnl{DEF-Tr3} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
+%	}
+%	\lnl{DEF-Tr6a} \For{$k=1,\dots,K$}{
+%		\lnl{DEF-Tr7a} Define thresholds $\Gamma_{min}^k$ and $\Gamma_{max}^k$\\
+%	}
+%	\lnl{DEF-Tr5} Define CDT parameters on $g(t)$ variance\\
+%	\textbf{Operational phase}:\\
+%	\lnl{DEF-Test1} \For{$t=T_{o},\dots,\infty$}{
+%		\lnl{DEF-Test2} Acquire frame $z_t$ \\
+%		\lnl{DEF-Tr3b} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
+%		\lnl{DEF-Test2a} $n=0$\\
+%		\lnl{DEF-Test4a} \For{$k=1,\dots,K$}{
+%			\lnl{DEF-Test5a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
+%			\lnl{DEF-Test6a} \If{$\frac{\partial g^k}{\partial t}(t) < \Gamma_{min}^k \vee \frac{\partial g^k}{\partial t}(t) > \Gamma_{max}^k $}{
+%				\lnl{DEF-Test7a} $n=n+1$\\
+%			}
+%		}
+%		\lnl{DEF-Test81} \If{$n \geq K-1$}{
+%			\lnl{DEF-Test91} $z_t$ is a defocused frame\\
+%		}
+%		\lnl{DEF-Test8} \If{CDT detect a change on $g(t)$ variance}{
+%			\lnl{DEF-Test9} $z_t$ is a defocused frame\\
+%		}
+%	}   
+%	\caption{Blur detection algorithm}
+%	\label{alg:DEFOCUS}
+%\end{algorithm}
 
 \begin{algorithm}[tp]
 	% \SetAlgoNoLine
 	\LinesNumbered
 	\SetAlgoNlRelativeSize{0}
 	\SetNlSty{small}{}{.}
+	\textbf{Input}: $\gamma$, $T_{o}$, $\{\mathcal{R}_k\}, k=1,\dots,K$ \\
 	\textbf{Configuration}:\\
-	\lnl{DISPL-Tr1} Extract regions $\{R_k\}, k=1,\dots,K$  \\
+%	\lnl{DISPL-Tr1} Extract regions $\{\mathcal{R}_k\}, k=1,\dots,K$  \\
 	\lnl{DISPL-Tr2} \For{$t=1,\dots,T_{o}$}
-	{	\lnl{DISPL-Tr3} Acquire frame $z_t$ \\
+	{	\lnl{DISPL-Tr3} Get frame $z_t$ \\
 		\lnl{DISPL-Tr4} \For{$k=1,\dots,K$}{
-			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\frac{\partial l^k}{\partial t}(t)$ for the region $R_k$\\
+			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $\mathcal{R}_k$\\
 		}
 	}
 	\lnl{DISPL-Tr6} \For{$k=1,\dots,K$}{
-		\lnl{DISPL-Tr7} Define thresholds $\Gamma_{min}^k$ and $\Gamma_{max}^k$\\
+		\lnl{DISPL-Tr7} Compute $\sigma_l^k$\\
 	}
 	\textbf{Operational phase}:\\
 	\lnl{DISPL-Test1} \For{$t=T_{o},\dots,\infty$}{
-		\lnl{DISPL-Test2} Acquire frame $z_t$ \\
-		\lnl{DISPL-Test3} $n = 0$ \\
+		\lnl{DISPL-Test2} Get frame $z_t$ \\
+		\lnl{DISPL-Test3} $n_l = 0$ \\
 		\lnl{DISPL-Test4} \For{$k=1,\dots,K$}{
-			\lnl{DISPL-Test5} Compute $l^k(t)$, $\frac{\partial l^k}{\partial t}(t)$ for the region $R_k$\\
-			\lnl{DISPL-Test6} \If{$\frac{\partial l^k}{\partial t}(t) < \Gamma_{min}^k \vee \frac{\partial l^k}{\partial t}(t) > \Gamma_{max}^k $}{
-				\lnl{DISPL-Test7} $n=n+1$\\
+			\lnl{DISPL-Test5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $\mathcal{R}_k$\\
+			\lnl{DISPL-Test6} \If{$\partial l^k(t) < -\gamma \sigma_l^k \vee \partial l^k(t) > \gamma \sigma_l^k $}{
+				\lnl{DISPL-Test7} $n_l=n_l+1$\\
 			}
 		}
-		\lnl{DISPL-Test8} \If{$n\geq K-1$}{
-			\lnl{DISPL-Test9} $z_t$ is a displaced frame\\
+		\lnl{DISPL-Test8} \If{$n_l\geq K-1$}{
+			\lnl{DISPL-Test9} $z_t$ is a tampered frame\\
 		}
 	}   
-	\caption{Displacement detection algorithm}
+	\caption{Tampering detection algorithm}
 	\label{alg:DISPL}
 \end{algorithm}
 \gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
@@ -337,10 +350,10 @@ In these sequences there were a few events of displacements or defocus, but to h
 
 \begin{figure}
 	\centering
-	\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus.pdf}}
-	\subfigure[]{\label{fig:ROCdefocusZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocusZOOM.pdf}}
-	\subfigure[]{\label{fig:ROCdispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement.pdf}}
 	\subfigure[]{\label{fig:ROCdisplZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacementZOOM.pdf}}
+%	\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus.pdf}}
+	\subfigure[]{\label{fig:ROCdefocusZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocusZOOM.pdf}}
+%	\subfigure[]{\label{fig:ROCdispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement.pdf}}
 	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
 	\label{fig:ROC}
 \end{figure}
