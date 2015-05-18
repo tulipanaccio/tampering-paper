@@ -141,7 +141,33 @@ mentre nel caso di uno spostamento della camera avremo
 
 
 \subsection{Scene Segmentation}\label{subsec:Segmentation}
-
+Consideriamo la sequenza $\{z_t\}$ di frame acquisiti dalla camera, con $t=1,\dots,T_{c}$.
+Per ciascun pixel $x\in\mathcal{X}$ calcoliamo un vettore $\textbf{d}(x)$ di $5$ elementi
+\begin{equation}
+\label{eq:featureVector}
+\textbf{d}(x)=\left[r(x);c(x);\mu_{\nabla}(x);\sigma_{\nabla}(x);\bar{z}(x)\right], \textbf{d}(x) \in \mathbb{R}^5
+\end{equation}
+dove:
+\begin{itemize}
+	\item $r(x)$ rappresenta il numero di riga del pixel $x$.
+	\item $c(x)$ rappresenta il numero di colonna del pixel $x$.
+	\item $\mu_{\nabla}(x)$ rappresenta il valore del gradiente nel pixel $x$ mediato nel tempo:
+	\begin{equation}
+	\label{eq:segmentazioneGrad}
+	\mu_{\nabla}(x) = \frac{\sum_{t=1}^{T_c}(\|\nabla z_t\|_2^2 \circledast f)(x)}{T_c},
+	\end{equation}
+	dove abbiamo indicato con $\|\nabla z_t\|_2^2$ la norma del gradiente per l'immagine $z_t$, definita in \eqref{eq:normaGradiente}, e con $f$ il filtro gaussiano discreto derivato dal campionamento di \eqref{eq:gaussian}.
+	\item $\sigma_{\nabla}(x)$ rappresenta la deviazione standard nel tempo del gradiente nel pixel $x$:
+	\begin{equation}
+	\label{eq:segmentazioneVar}
+	\sigma_{\nabla}(x)=\sqrt{\frac{1}{T_c - 1}\sum_{t=1}^{T_c}\left(\left(\|\nabla z_t\|_2^2 \circledast f\right)(x)-\mu_{\nabla}(x)\right)^2}.
+	\end{equation}
+	\item $\bar{z}(x)$ rappresenta il valore della luma del pixel $x$ mediato nel tempo:
+	\begin{equation}
+	\label{eq:segmentazioneLuma}
+	\bar{z}(x)=\frac{\sum_{t=1}^{T_c}( z_t \circledast f)(x)}{T_c}.
+	\end{equation}
+\end{itemize}
 \subsection{Indicators}\label{subsec:Indicators}
 \gi{Adriano: mettere formule degli indicatori e anche del frame difference qua}
 
@@ -329,6 +355,24 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 \gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{Immagini/buenosAires}
+\caption{}
+\label{fig:buenosAires}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{Immagini/buenosAiresDef}
+\caption{}
+\label{fig:buenosAiresDef}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{Immagini/fulvioTestiDispl}
+\caption{}
+\label{fig:fulvioTestiDispl}
+\end{figure}
 
 \subsection{Dataset Description}\label{subsec:Dataset}
 \gi{Adriano: Prova a mettere qua le info}
