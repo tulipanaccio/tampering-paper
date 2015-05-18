@@ -19,7 +19,7 @@
 \newcommand{\cl}[1]{{\textcolor{red}{[\small \textbf{Claudio}: #1]}}}
 
 \begin{document}
-\title{Tampering detection for low-power smart cameras}
+\title{Tampering Detection For Low-Power Smart Cameras}
 
 \author{Adriano Gaibotti\inst{1}\inst{2} \and Claudio Marchisio\inst{2} \and Alexandro Sentinelli\inst{2} \and Giacomo Boracchi\inst{1}}
 
@@ -33,21 +33,24 @@
 \maketitle
 
 \begin{abstract}
-One of the most critical issues in smart cameras, used as nodes in wireless multimedia sensor networks (WMSN), is the automatic detection of events that could compromise the correct acquisition of the scene, such as the presence of water on the camera lens, or the displacement of the device, or tampering events. 
-In general, techniques used to identify these type of events are called tampering detection algorithms.
-We introduce a solution for the tampering detection issue which can be used for low-power and embedded smart cameras, in which the acquisition is done with low frame rate, such as one frame every minute.
-The solution consists in a segmentation of the acquired scene in adaptive regions, and monitoring some features in each region, in order to find a change in their behavior that could be associated to a tampering event.
-Experiments show that our solution increase the performances with respect to monitoring the whole scene, with low computational complexity.
-\keywords{tampering, defocus, displacement, segmentation, gradient}
+A desirable feature for smart cameras is the ability to autonomously detect any tampering event that would prevent a clean view over the monitored scene. No matter whether tampering is due to atmospheric phenomena (e.g., few water drops over the camera lens) or to malicious events (e.g., the device displacement), these have to be promptly detected to possibly activate countermeasures. Tampering detection becomes particularly challenging in battery-powered cameras, where it is not possible to acquire images at video-like frame-rates, nor use sophisticated image-analysis algorithms. 
+
+We here introduce a tampering-detection algorithm that has been specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous values of the indicators are detected as a tampering events. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image during the algorithm-configuration phase, and which shows to substantially improve the detection performance for camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one per minute, and at a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
+
+
+\keywords{tampering detection, defocus, displacement detection}
 \end{abstract}
 
 
 
 \section{Introduction}\label{sec:introduction}
 
-\gi{Adriano: metti un paio di foto per spiegare il problema che consideriamo.}
 
+One of the most critical issues in smart cameras, used as nodes in wireless multimedia sensor networks (WMSN), is the automatic detection of events that could 
 
+In general, techniques used to identify these type of events are called tampering detection algorithms.
+
+A desirable feature for smart cameras is the ability to autonomously detect any tampering event that could impair a clean view over the monitored scene. No matter whether tampering events are due to atmospheric phenomena (e.g., water drops over the camera lens) or malicious attacks (e.g. displacement of the device), these have to be promptly detected and reported. 
 
 \begin{figure}
 \centering
@@ -91,14 +94,23 @@ Random Toughs:
 
 \section{Problem Formulation}\label{sec:probForm}
 
-\gi{Adriano: metti le formule di quello della tesi circa displacemente e out of focus. Poi condensiamo il tutto}
-
-
+Let us denote by $z_t$ the frame that acquired at time $t$, which we model as
 \begin{equation}
-\label{eq:blur_single}
-z(x)=\mathcal{D}[y](x) = \mathcal{B}[y](x) + \eta(x), \qquad x \in \mathcal{X}
+\label{eq:observationModel}
+z_t(x)=\mathcal{D}_t[y_t](x) \forall x \in X
 \end{equation}
+where $\mathcal{D}$ denotes the degradation operator, which transforms the original frame $y_t$ in our observation; $X \subset \mathbb{Z}$ denotes the regular pixels grid and $x$ is a vector indicating the pixel coordinates. When there is no tampering, the frame 
+\begin{equation}
+\label{eq:no tampering}
+\mathcal{D}_t[y_t](x) = y_t(x) + \eta_t(x) \forall x \in X
+\end{equation}
+where $\eta_t$ is a random variable accounting for all the noise sources (thermal, quantization, photon-counting). 
 
+However, when the camera 
+\begin{equation}
+\label{eq:defocus}
+\mathcal{D}_t[y_t](x) = \mathcal{B}_t[y_t](x) + \eta_t(x) \forall x \in X
+\end{equation}
 
 \begin{equation}
 \label{eq:blur}
