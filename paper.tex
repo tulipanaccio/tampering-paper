@@ -95,57 +95,58 @@ In contrast, no background models are used in \cite{alippi2010detecting}, where 
 
 \section{Problem Formulation}\label{sec:probForm}
 
-Let us denote by $z_t$ the frame that acquired at time $t$, which we model as
+Let us denote by $z_t$ the frame acquired at time $t$, which we model as
 \begin{equation}
 \label{eq:observationModel}
-z_t(x)=\mathcal{D}_t[y_t](x) \forall x \in X
+z_t(x)=\mathcal{D}_t[y_t](x) \quad \forall x \in X
 \end{equation}
-where $\mathcal{D}$ denotes the degradation operator, which transforms the original frame $y_t$ in our observation; $X \subset \mathbb{Z}$ denotes the regular pixels grid and $x$ is a vector indicating the pixel coordinates. When there is no tampering, the frame 
+where $\mathcal{D}_t$ denotes the degradation operator that transforms the original image $y_t$ in the frame $z_t$ which we acquire; $X \subset \mathbb{Z}$ denotes the regular pixels grid and $x$ is a vector indicating the pixel coordinates. As far as there is no tampering attacks/events,
 \begin{equation}
-\label{eq:no tampering}
-\mathcal{D}_t[y_t](x) = y_t(x) + \eta_t(x) \forall x \in X
+\label{eq:no_tampering}
+\mathcal{D}_t[y_t](x) = y_t(x) + \eta_t(x) \quad \forall x \in X
 \end{equation}
-where $\eta_t$ is a random variable accounting for all the noise sources (thermal, quantization, photon-counting). 
+where $\eta_t$ is a random variable accounting for all the noise sources (thermal, quantization, photon-counting). In normal conditions, all the images $y_t$ (thus also the frames $z_t$) might be different in content but are acquired from the same viewpoint and the same camera orientation.
 
-However, when the camera 
+When at time $\tau^*$ an external disturbance over the camera lens introduces a defocus, the image $y_t$ is blurred by spatially variant operator:
 \begin{equation}
-\label{eq:defocus}
-\mathcal{D}_t[y_t](x) = \mathcal{B}_t[y_t](x) + \eta_t(x) \forall x \in X
+\label{eq:model_defocus}
+\mathcal{D}_t[y_t](x) = \int_{\mathcal{X}}y(s)h_t(x,s)ds\, + \eta_t(x) \quad \forall x \in X, t \leq \tau^*
 \end{equation}
+%where  $\mathcal{B}_t$ corresponds to a linear operator
+%\begin{equation}
+%\label{eq:blur}
+%\mathcal{B}[y](x) = \int_{\mathcal{X}}y(s)h(x,s)ds\,,
+%\end{equation}
+where $h_t(x,\cdot) > 0$ is the point-spread function at pixel $x \in X$.
 
+%\begin{equation}
+%\label{eq:blur_convolution}
+%\mathcal{B}[y](x) = \int_{\mathcal{X}}y(s)h(s-x)ds,
+%\end{equation}
+%
+%\begin{equation}
+%\label{eq:blur_multi}
+%z_t(x)=\mathcal{D}_t[y_t](x) = \mathcal{B}_t[y_t](x) + \eta(x), \qquad x \in \mathcal{X}.
+%\end{equation}
+A camera displacement at frame $\tau^*$ is modeled as 
 \begin{equation}
-\label{eq:blur}
-\mathcal{B}[y](x) = \int_{\mathcal{X}}y(s)h(x,s)ds,
-\end{equation}
-
-
-\begin{equation}
-\label{eq:blur_convolution}
-\mathcal{B}[y](x) = \int_{\mathcal{X}}y(s)h(s-x)ds,
-\end{equation}
-
-\begin{equation}
-\label{eq:blur_multi}
-z_t(x)=\mathcal{D}_t[y_t](x) = \mathcal{B}_t[y_t](x) + \eta(x), \qquad x \in \mathcal{X}.
-\end{equation}
-
-\begin{equation}
-\label{eq:displacement}
+\label{eq:model_displacement}
 z_t(x)  = \left\{ \begin{array}{rcl}
 y_t(x) + \eta(x) & \mbox{per} & t < T^* \\
 w_t(x) + \eta(x) & \mbox{per} & t \geqslant T^*
 \end{array}\right. ,
 \end{equation}
+where $w_t$ is acquired from a different viewpoint and/or camera orientation than $y_t$. 
 
+The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\}_t$ and detect frames at time $\tau^*$ that correspond to a tampering like \eqref{eq:model_defocus} or \eqref{eq:model_displacement}.
 
-Per $t<T^*$ abbiamo che i frame vengono acquisiti in condizioni di funzionamento normale:
-\[ z_t(x)=y_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t=1,\dots , T^*-1. \] 
-All'istante di tempo $t = T^*$ avviene un evento di tampering, il quale compromette i frame per $t\geq T^*$.  
-In particolare, nel caso di una sfocatura avremo
-\[ z_t = \mathcal{B}_t[y_t](x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*,\]
-mentre nel caso di uno spostamento della camera avremo
-\[ z_t = w_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*. \]
-
+%Per $t<T^*$ abbiamo che i frame vengono acquisiti in condizioni di funzionamento normale:
+%\[ z_t(x)=y_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t=1,\dots , T^*-1. \] 
+%All'istante di tempo $t = T^*$ avviene un evento di tampering, il quale compromette i frame per $t\geq T^*$.  
+%In particolare, nel caso di una sfocatura avremo
+%\[ z_t = \mathcal{B}_t[y_t](x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*,\]
+%mentre nel caso di uno spostamento della camera avremo
+%\[ z_t = w_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*. \]
 
 
 \section{Proposed Solution}\label{sec:propSol}
