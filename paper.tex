@@ -392,8 +392,10 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 \gi{Adriano: Prova a mettere qua le info}
 The proposed method have been tested on a dataset of frame sequences in which there were tampering events.
 A part of this dataset was taken using a Raspberry Pi with its camera module, and the tampering was introduced by moving the device or putting water on the camera.
-The other part of this dataset is made of frame sequences taken from web-cams available on the Internet. 
-In these sequences there were a few events of displacements or defocus, but to have a larger set of tampering events we
+The other part of this dataset is made of frame sequences taken from webcams available on the Internet. 
+In these sequences there were a few events of displacements or defocus, but to have a larger set of tampering events we have simulated them.
+In particular we have used gaussian filtering for simulating defocus events, and concatenation of similar sequences for simulating displacement events.\\
+
 \subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
 \begin{itemize}
 \item Full
