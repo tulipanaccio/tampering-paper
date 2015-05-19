@@ -21,14 +21,14 @@
 \begin{document}
 \title{Tampering Detection In Low-Power Smart Cameras}
 
-\author{Adriano Gaibotti\inst{1}\inst{2} \and Claudio Marchisio\inst{2} \and Alexandro Sentinelli\inst{2} \and Giacomo Boracchi\inst{1}}
+\author{Adriano Gaibotti\inst{1} \and Claudio Marchisio\inst{1} \and Alexandro Sentinelli\inst{1} \and Giacomo Boracchi\inst{2}}
 
 \institute{ 
-	Politecnico di Milano, Dipartimento di Elettronica, Informazione e Bioingegneria (DEIB), Via Ponzio 34/5, 20133, Milano (MI), Italy\\
-	\email{adriano.gaibotti@mail.polimi.it, giacomo.boracchi@polimi.it}
-	\and
 	STMicroelectronics, Advanced System Technology, Via Camillo Olivetti 2, 20864, Agrate Brianza (MB), Italy\\
 	\email{\{adriano.gaibotti, claudio.marchisio, alexandro.sentinelli\}@st.com}
+	\and
+	Politecnico di Milano, Dipartimento di Elettronica, Informazione e Bioingegneria (DEIB), Via Ponzio 34/5, 20133, Milano (MI), Italy\\
+	\email{giacomo.boracchi@polimi.it}
 }
 \maketitle
 
@@ -44,7 +44,7 @@ We here introduce a tampering-detection algorithm that has been specifically des
 
 
 \section{Introduction}\label{sec:introduction}
-\gi{Adriano: decidi che email tenere, non tutte e due :)}
+%\gi{Adriano: decidi che email tenere, non tutte e due :)}
 
 %We here address the problem of detecting tampering events/attacks in camera devices, and in particular those preventing the proper acquisition of the monitored scene. 
 
@@ -187,7 +187,7 @@ dove:
 \begin{equation}
 \label{eq:gradientRegions}
 \begin{array}{ccc}
-g^k(t)&  = & \mathcal{G}^k[z_t] = \frac{\sum_{\mathcal{R}_k}\| \nabla z_t(x) \| _2^2 }{|{\mathcal{R}_k}|}\\
+g^k(t)&  = & \mathcal{G}^k[z_t] = \frac{\sum_{R_k}\| \nabla z_t(x) \| _2^2 }{|{R_k}|}\\
 \partial g^k(t) & =& g^k(t)-g^k(t-1) 
 \end{array},
 \end{equation}
@@ -221,7 +221,7 @@ In particolare ci aspettiamo che l'evento di sfocatura provochi un abbattimento 
 \begin{equation}
 \label{eq:lumaRegions}
 \begin{array}{ccc}
-l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{\mathcal{R}_k} z_t(x) }{|{\mathcal{R}_k}|}\\
+l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{R_k} z_t(x) }{|{R_k}|}\\
 \partial l^k(t) & =& l^k(t)-l^k(t-1) 
 \end{array},
 \end{equation}
@@ -336,13 +336,13 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 	\LinesNumbered
 	\SetAlgoNlRelativeSize{0}
 	\SetNlSty{small}{}{.}
-	\textbf{Input}: $\gamma$, $T_{o}$, $\{\mathcal{R}_k\}, k=1,\dots,K$ \\
+	\textbf{Input}: $\gamma$, $T_{o}$, $\{R_k\}, k=1,\dots,K$ \\
 	\textbf{Configuration}:\\
 %	\lnl{DISPL-Tr1} Extract regions $\{\mathcal{R}_k\}, k=1,\dots,K$  \\
 	\lnl{DISPL-Tr2} \For{$t=1,\dots,T_{o}$}
 	{	\lnl{DISPL-Tr3} Get frame $z_t$ \\
 		\lnl{DISPL-Tr4} \For{$k=1,\dots,K$}{
-			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $\mathcal{R}_k$\\
+			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $R_k$\\
 		}
 	}
 	\lnl{DISPL-Tr6} \For{$k=1,\dots,K$}{
@@ -353,7 +353,7 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 		\lnl{DISPL-Test2} Get frame $z_t$ \\
 		\lnl{DISPL-Test3} $n_l = 0$ \\
 		\lnl{DISPL-Test4} \For{$k=1,\dots,K$}{
-			\lnl{DISPL-Test5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $\mathcal{R}_k$\\
+			\lnl{DISPL-Test5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $R_k$\\
 			\lnl{DISPL-Test6} \If{$\partial l^k(t) < -\gamma \sigma_l^k \vee \partial l^k(t) > \gamma \sigma_l^k $}{
 				\lnl{DISPL-Test7} $n_l=n_l+1$\\
 			}
@@ -365,58 +365,91 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 	\caption{Tampering detection algorithm}
 	\label{alg:DISPL}
 \end{algorithm}
-\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
+%\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
+The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
+The first one refers to frame sequences taken from webcams recording some parts of cities (as frames illustrated in Figure \ref{fig:buenosAires}), where we have introduced some synthetically generated tampering events:
+defocus has been simulated using gaussian filters, while displacement has been created with concatenation of similar frame sequences.
 \begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{Immagini/buenosAires}
-\caption{}
-\label{fig:buenosAires}
+	\centering
+	\includegraphics[width=1\linewidth]{Immagini/buenosAires}
+	\caption{Example of frame sequence taken from webcam. Frames have been acquired every $30$ seconds.}
+	\label{fig:buenosAires}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth]{Immagini/buenosAiresDef}
-\caption{}
-\label{fig:buenosAiresDef}
+\subfigure[]{\label{fig:buenosAiresDef} \includegraphics[width=1\linewidth]{Immagini/buenosAiresDef}}
+\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=1\linewidth]{Immagini/buenosAiresDispl}}
+\caption{Examples of synthetically generated tampering events. \textbf{(a)} Defocus generated with gaussian filters on frames \textit{d} and \textit{e}. \textbf{(b)} Displacement created doing concatenation of similar sequences on frames \textit{d} and \textit{e}.}
+\label{fig:buenosAiresTamp}
 \end{figure}
+In some cases these sequences contained real tampering events, as in Figure \ref{fig:fulvioTestiDispl}.\\
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{Immagini/fulvioTestiDispl}
-\caption{}
+\caption{Example of sequence taken from webcam in which there is a real displacement (frame \textit{d})}
 \label{fig:fulvioTestiDispl}
 \end{figure}
-
-\subsection{Dataset Description}\label{subsec:Dataset}
-\gi{Adriano: Prova a mettere qua le info}
-The proposed method have been tested on a dataset of frame sequences in which there were tampering events.
-A part of this dataset was taken using a Raspberry Pi with its camera module, and the tampering was introduced by moving the device or putting water on the camera.
-The other part of this dataset is made of frame sequences taken from webcams available on the Internet. 
-In these sequences there were a few events of displacements or defocus, but to have a larger set of tampering events we have simulated them.
-In particular we have used gaussian filtering for simulating defocus events, and concatenation of similar sequences for simulating displacement events.\\
+The second dataset was taken using a Raspberry Pi Model B+, with its camera module, and the tampering was introduced by moving the device or putting water on the camera.\\
+Four figures of merit have been suggested to assess the performance of the proposed algorithm:\\
+\begin{description}
+	\item[TP]  True positives. It measures the number of tampering events correctly detected by the algorithm.\\ 
+	\item[TN]  True negatives. It measures the number of frames without tampering that are not detected by the algorithm. \\ 
+	\item[FP]  False positives. It measures the number of tampering events erroneously detected by the algorithm.\\ 
+	\item[FN]  False negatives. It measures the number of tampering events not detected by the algorithm. \\ 
+\end{description} 
+These indicators are computed varying the parameter $\gamma$, which defines the thresholds for the one-shot monitoring. 
+This permits us to generate \textit{ROC curves}, where on the x-axis there is:
+\[1-\text{SPECIFICITY}_\gamma = 1-\frac{\text{TN}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma}=\frac{\text{FP}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma},\]
+while on th y-axis there is:
+\[\text{RECALL}_\gamma=\frac{\text{TP}_\gamma}{\text{TP}_\gamma+\text{FN}_\gamma}.\]
+The construction of these curves permits us to make a comparison with respect to other methods.
+In particular the alternative approaches that we have considered working:
+\begin{itemize}
+\item considering the whole scene for the features computation;
+\item considering adaptive region as described in Section \ref{sec:propSol} for the feature computation;
+\item considering voronoi regions for the feature computation.
+\end{itemize}
 
 \subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
-\begin{itemize}
-\item Full
-\item Adaptive Region
-\item Voronoi Regions
-\end{itemize}
+
 
 \subsection{Performance Assessment}
 \gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
 
 \gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
 
+% \begin{figure}
+	% \centering
+	% \subfigure[]{\label{fig:ROCdisplZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacementZOOM.pdf}}
+% %	\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus.pdf}}
+	% \subfigure[]{\label{fig:ROCdefocusZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocusZOOM.pdf}}
+% %	\subfigure[]{\label{fig:ROCdispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement.pdf}}
+	% \caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
+	% \label{fig:ROC}
+% \end{figure}
+
 \begin{figure}
 	\centering
-	\subfigure[]{\label{fig:ROCdisplZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacementZOOM.pdf}}
-%	\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus.pdf}}
-	\subfigure[]{\label{fig:ROCdefocusZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocusZOOM.pdf}}
-%	\subfigure[]{\label{fig:ROCdispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement.pdf}}
+	\includegraphics[width=0.7\linewidth]{Immagini/ROCdisplacement_luma}
 	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
-	\label{fig:ROC}
+	\label{fig:ROCdispl_luma}
 \end{figure}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{Immagini/ROCdisplacement_fd}
+	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
+	\label{fig:ROCdispl_fd}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus}
+	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
+	\label{fig:ROCdispl_luma}
+\end{figure}
 
 %\begin{figure}
 %\centering
