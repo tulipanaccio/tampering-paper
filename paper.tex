@@ -184,7 +184,7 @@ dove:
 \begin{equation}
 \label{eq:gradientRegions}
 \begin{array}{ccc}
-g^k(t)&  = & \mathcal{G}^k[z_t] = \frac{\sum_{\mathcal{R}_k}\| \nabla z_t(x) \| _2^2 }{|{\mathcal{R}_k}|}\\
+g^k(t)&  = & \mathcal{G}^k[z_t] = \frac{\sum_{R_k}\| \nabla z_t(x) \| _2^2 }{|{R_k}|}\\
 \partial g^k(t) & =& g^k(t)-g^k(t-1) 
 \end{array},
 \end{equation}
@@ -218,7 +218,7 @@ In particolare ci aspettiamo che l'evento di sfocatura provochi un abbattimento 
 \begin{equation}
 \label{eq:lumaRegions}
 \begin{array}{ccc}
-l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{\mathcal{R}_k} z_t(x) }{|{\mathcal{R}_k}|}\\
+l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{R_k} z_t(x) }{|{R_k}|}\\
 \partial l^k(t) & =& l^k(t)-l^k(t-1) 
 \end{array},
 \end{equation}
@@ -401,14 +401,16 @@ This permits us to generate \textit{ROC curves}, where on the x-axis there is:
 \[1-\text{SPECIFICITY}_\gamma = 1-\frac{\text{TN}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma}=\frac{\text{FP}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma},\]
 while on th y-axis there is:
 \[\text{RECALL}_\gamma=\frac{\text{TP}_\gamma}{\text{TP}_\gamma+\text{FN}_\gamma}.\]
-The construction of these curves permits us to 
+The construction of these curves permits us to make a comparison with respect to other methods.
+In particular the alternative approaches that we have considered working:
+\begin{itemize}
+\item considering the whole scene for the features computation;
+\item considering adaptive region as described in Section \ref{sec:propSol} for the feature computation;
+\item considering voronoi regions for the feature computation.
+\end{itemize}
 
 \subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
-\begin{itemize}
-\item Full
-\item Adaptive Region
-\item Voronoi Regions
-\end{itemize}
+
 
 \subsection{Performance Assessment}
 \gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
