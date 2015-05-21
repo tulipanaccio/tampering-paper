@@ -371,7 +371,6 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
 The first one refers to frame sequences taken from webcams recording some parts of cities (as frames illustrated in Figure \ref{fig:buenosAires}), where we have introduced some synthetically generated tampering events:
 defocus has been simulated using gaussian filters, while displacement has been created with concatenation of similar frame sequences.
-
 In some cases these sequences contained real tampering events, as in Figure \ref{fig:fulvioTestiDispl}.\\
 \begin{figure}
 \centering
@@ -407,26 +406,24 @@ In particular the alternative approaches that we have considered working:
 %\gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
 %
 %\gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
-Experimental results are shown in Figures \ref{fig:ROCdispl_luma}, \ref{fig:ROCdispl_fd}, \ref{fig:ROCdef_grad}, \ref{fig:ROCdef_fd}.
-
 \begin{figure}
 \centering
-\subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_luma}}
-\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_fd}}
-\caption{Examples of synthetically generated tampering events. \textbf{(a)} Defocus generated with gaussian filters on frames \textit{d} and \textit{e}. \textbf{(b)} Displacement created doing concatenation of similar sequences on frames \textit{d} and \textit{e}.}
-\label{fig:buenosAiresTamp}
+\subfigure[]{\label{fig:ROCdisplacement_luma}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_luma}}
+\subfigure[]{\label{fig:ROCdisplacement_fd} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_fd}}
+\caption{ROC curves for displacement detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean luma energy. \textbf{(b)} Analysis of the frame differencing.}
+\label{fig:ROCdisplacement}
 \end{figure}
-
 \begin{figure}
 \centering
 \subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus1}}
 \subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus_fd}}
-\caption{Examples of synthetically generated tampering events. \textbf{(a)} Defocus generated with gaussian filters on frames \textit{d} and \textit{e}. \textbf{(b)} Displacement created doing concatenation of similar sequences on frames \textit{d} and \textit{e}.}
-\label{fig:buenosAiresTamp}
+\caption{ROC curves for defocus detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean gradient energy. \textbf{(b)} Analysis of the frame differencing.}
+\label{fig:ROCdisplacement}
+\label{fig:ROCdefocus}
 \end{figure}
-
+Experimental results are shown in Figures \ref{fig:ROCdisplacement} and \ref{fig:ROCdefocus}.
 \subsection{Discussion}
-\gi{Adiano: Aggiungi qua la complessit\'a computazionale}
+\gi{Adriano: Aggiungi qua la complessit\'a computazionale}
 
 \section{Conclusion}\label{sec:Conclusion}
 \gi{Adriano: butta in inglese gli ongoing works (come ultima cosa)}
