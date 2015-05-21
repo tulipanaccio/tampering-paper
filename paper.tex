@@ -61,20 +61,20 @@ As an example, consider Wireless Multimedia Sensor Networks (WMSN) \cite{akyildi
 
 
 % Why is it hard? (E.g., why do naive approaches fail?)
-Tampering detection in low-power smart cameras is much more challenging than in conventional surveillance cameras \cite{perrig2004security}. Beside computational aspects -- such as the number of operations per pixels allowed -- the big issue is that low-power smart cameras typically operate at very low-frame rates (e.g., less than one frame per minute), and the acquired sequence does not evolve smoothly. This prevents the use of learned background models and the analysis of foreground variations \gi{REFERENCE su BKGR SUBTRACTION}. When dynamic environments are acquired at low frame rates, like the example depicted in Fig. \ref{fig:buenosAires}, two consecutive frames might be very different because of changes in the scene and in the light conditions: smart cameras have to correctly distinguish between these \emph{normal} changes and changes due to camera displacement or blur/defocus. Moreover, in low-power smart cameras, tampering has to be reliably detected because false alerts would lead to unnecessary energy waste.
+Tampering detection in low-power smart cameras is much more challenging than in conventional surveillance cameras \cite{perrig2004security}. Beside computational aspects -- such as the number of operations per pixels allowed -- the big issue is that low-power smart cameras typically operate at very low-frame rates (e.g., less than one frame per minute), and the acquired sequence does not evolve smoothly. This prevents the use of learned background models and the analysis of foreground variations \cite{piccardi2004background}. When dynamic environments are acquired at low frame rates, like the example depicted in Fig. \ref{fig:buenosAires}, two consecutive frames might be very different because of changes in the scene and in the light conditions: smart cameras have to correctly distinguish between these \emph{normal} changes and changes due to camera displacement or blur/defocus. Moreover, in low-power smart cameras, tampering has to be reliably detected because false alerts would lead to unnecessary energy waste.
 
 % We here address the problem of detecting tampering events on a camera device that is employed for monitoring purpose. Tampering events can be due to malicious attacks, as for instance a displacement of the camera or spraying some dirty liquid that would prevent the acquisition of (part of) the monitored scene or the interpretation of the content (e.g., the identification of licence plates). 
 
 
 %What are the key components of my approach and results? Also include any specific limitations.
-This work presents an algorithm to detect both camera defocus and of displacement, as stated in Section \ref{sec:probForm}. The algorithm relies on simple indicators that are computed with a low computational complexity (Section \ref{subsec:Indicators}) and leverages an outlier detection technique to detect frames yielding anomalous indicators as related to a tampering event (Section \ref{subsec:MonitoringScheme}). In particular, we perform a preliminarily partitioning of the scene into nonoverlapping regions, and separately compute and monitor indicators over different regions. Scene partitioning is defined by clustering feature vectors gathering the indicators in different pixels, thus performing a very coarse segmentation of the image (Section \ref{subsec:Segmentation}). Regions are computed during the initial configuration of the algorithm and as such do not implies any computational overhead w.r.t. operating on the whole image. Our experiments in Section \ref{sec:experiments} show that regions substantially improve the detection of camera displacements, while when monitoring indicators meant to detect blur/defocus, it is more convenient to consider the whole scene at once. Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
+This work presents an algorithm to detect both camera defocus and displacement, as stated in Section \ref{sec:probForm}. The algorithm relies on simple indicators that are computed with a low computational complexity (Section \ref{subsec:Indicators}) and leverages an outlier detection technique to detect frames yielding anomalous indicators as related to a tampering event (Section \ref{subsec:MonitoringScheme}). In particular, we perform a preliminarily partitioning of the scene into nonoverlapping regions, and separately compute and monitor indicators over different regions. Scene partitioning is defined by clustering feature vectors gathering the indicators in different pixels, thus performing a very coarse segmentation of the image (Section \ref{subsec:Segmentation}). Regions are computed during the initial configuration of the algorithm and as such do not implies any computational overhead w.r.t. operating on the whole image. Our experiments in Section \ref{sec:experiments} show that regions substantially improve the detection of camera displacements, while when monitoring indicators meant to detect blur/defocus, it is more convenient to consider the whole scene at once. Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
 
 
 \begin{figure}[t!]
 \centering
 \subfigure[]{\label{fig:pioggia} \includegraphics[width=0.4\linewidth]{Immagini/pioggia}}
 \subfigure[]{\label{fig:neve} \includegraphics[width=0.4\linewidth]{Immagini/neve}}
-\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens, while in Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens.}
+\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. \textbf{(a)} Blur due to rain drops on the camera lens. \textbf{(b)} Occlusion due to some snow on the camera lens.}
 \label{fig:tampering}
 \end{figure}
 
@@ -244,6 +244,11 @@ l(t) = \mathcal{L}[z_t] =\frac{\sum_{\mathcal{X}} z_t(x) }{|\mathcal{X}|} ,
 \frac{\partial l}{\partial t}(t) = l(t) - l(t-1).
 \end{equation}
 
+FRAME DIFFERENCE:
+\begin{equation}
+	\label{eq:frameDiffReg}
+	\varphi_k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
+\end{equation}
 
 \subsection{Outlier Detection}\label{subsec:MonitoringScheme}
 
@@ -282,7 +287,6 @@ $\hat{\sigma}_l^k$ indica la deviazione standard delle osservazioni del training
 \hat{\sigma}_l^k  = \sqrt{\frac{1}{T_{o}-1}\sum_{\tau=1}^{T_{o}}\left(\frac{\partial l^k}{\partial t}(\tau) - \hat{\mu}_l^k(\tau)\right)^2} \nonumber
 \end{equation}
 e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
-
 
 
 
@@ -369,12 +373,12 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 
 \section{Experiments}\label{sec:experiments}
 The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
-The first one refers to frame sequences taken from webcams recording some parts of cities (as frames illustrated in Figure \ref{fig:buenosAires}), where we have introduced some synthetically generated tampering events:
-defocus has been simulated using gaussian filters, while displacement has been created with concatenation of similar frame sequences.
-In some cases these sequences contained real tampering events, as in Figure \ref{fig:fulvioTestiDispl}.\\
+The first one refers to frame sequences taken from webcams recording some parts of cities (as in Figure \ref{fig:sequences}(a)), where we have introduced some synthetically generated tampering events:
+defocus has been simulated using gaussian filters (\ref{fig:sequences}(b)), while displacement has been created with concatenation of similar frame sequences (Figure \ref{fig:sequences}(c)).
+In some cases these sequences contained real tampering events, as in Figure \ref{fig:sequences}(d).\\
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth]{Immagini/sequenze}
+\includegraphics[width=0.9\linewidth]{Immagini/sequenze}
 \caption{Sequences taken from webcams: \textbf{(a)} no tampering events; \textbf{(b)} defocus event on 4-th and 5-th frames, created using gaussian filtering; \textbf{(c)} displacement event on 4-th and 5-th frames, created using concatenation between similar sequences; \textbf{(d)} real displacement event on 4-th frame.}
 \label{fig:sequences}
 \end{figure}
@@ -395,8 +399,8 @@ The construction of these curves permits us to make a comparison with respect to
 In particular the alternative approaches that we have considered working:
 \begin{itemize}
 \item considering the whole scene for the features computation;
-\item considering adaptive region as described in Section \ref{sec:propSol} for the feature computation;
-\item considering voronoi regions for the feature computation.
+\item considering adaptive region, as described in Section \ref{sec:propSol}, for the feature computation;
+\item considering voronoi regions \cite{aurenhammer1991voronoi}, which are easier to compute with respect to our solution but don't consider the scene content, for the feature computation.
 \end{itemize}
 %
 %% \subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
@@ -422,6 +426,8 @@ In particular the alternative approaches that we have considered working:
 \label{fig:ROCdefocus}
 \end{figure}
 Experimental results are shown in Figures \ref{fig:ROCdisplacement} and \ref{fig:ROCdefocus}.
+As we could see there is an improvement, in the detection of camera displacements, with our approach which separately analizes the behavior of indicators in adaptive regions.
+On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitoring indicators meant to detect blur/defocus, it is more convenient to consider the whole scene at once.
 \subsection{Discussion}
 \gi{Adriano: Aggiungi qua la complessit\'a computazionale}
 
@@ -434,9 +440,10 @@ Random Toughs:
 \item The problem of false alarms, radio module activation
 \item Other tampering attacks like obfuscation (??) which might be due to environmental phenomena such as rain, fog and mist over the camera lenses have to be detected by image analysis methods
 \item Displacement can be perceived by MEMS as well but these device alone are prone to false alarms. Visual inspection is necessary to reduce false alarms
-
 \end{itemize}
-
+Ongoing work regards the extension of our solution to other types of tampering, as occlusions or imaging sensor degradations.
+Furthermore, we are investigating strategies to improve the detection performance and reduce the number of \textit{FP}s by combination of our solution with other techniques:
+for example we could use sequential techniques on the features, or integrate the frame analysis with the data extracted from MEMS inertial sensors.   
 
 \section*{Acknowledgments}\label{sec:Acknowledgments}
 Authors would like to thank ST for supporting Adriano Gaibotti.
