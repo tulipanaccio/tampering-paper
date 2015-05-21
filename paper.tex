@@ -371,25 +371,13 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
 The first one refers to frame sequences taken from webcams recording some parts of cities (as frames illustrated in Figure \ref{fig:buenosAires}), where we have introduced some synthetically generated tampering events:
 defocus has been simulated using gaussian filters, while displacement has been created with concatenation of similar frame sequences.
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{Immagini/buenosAires}
-	\caption{Example of frame sequence taken from webcam. Frames have been acquired every $30$ seconds.}
-	\label{fig:buenosAires}
-\end{figure}
-\begin{figure}
-\centering
-\subfigure[]{\label{fig:buenosAiresDef} \includegraphics[width=1\linewidth]{Immagini/buenosAiresDef}}
-\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=1\linewidth]{Immagini/buenosAiresDispl}}
-\caption{Examples of synthetically generated tampering events. \textbf{(a)} Defocus generated with gaussian filters on frames \textit{d} and \textit{e}. \textbf{(b)} Displacement created doing concatenation of similar sequences on frames \textit{d} and \textit{e}.}
-\label{fig:buenosAiresTamp}
-\end{figure}
+
 In some cases these sequences contained real tampering events, as in Figure \ref{fig:fulvioTestiDispl}.\\
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth]{Immagini/fulvioTestiDispl}
-\caption{Example of sequence taken from webcam in which there is a real displacement (frame \textit{d})}
-\label{fig:fulvioTestiDispl}
+\includegraphics[width=1\linewidth]{Immagini/sequenze}
+\caption{Sequences taken from webcams: \textbf{(a)} no tampering events; \textbf{(b)} defocus event on 4-th and 5-th frames, created using gaussian filtering; \textbf{(c)} displacement event on 4-th and 5-th frames, created using concatenation between similar sequences; \textbf{(d)} real displacement event on 4-th frame.}
+\label{fig:sequences}
 \end{figure}
 The second dataset was taken using a Raspberry Pi Model B+, with its camera module, and the tampering was introduced by moving the device or putting water on the camera.\\
 Four figures of merit have been suggested to assess the performance of the proposed algorithm:\\
@@ -411,59 +399,31 @@ In particular the alternative approaches that we have considered working:
 \item considering adaptive region as described in Section \ref{sec:propSol} for the feature computation;
 \item considering voronoi regions for the feature computation.
 \end{itemize}
-
-\subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
-
-
-\subsection{Performance Assessment}
-\gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
-
-\gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
-
-% \begin{figure}
-	% \centering
-	% \subfigure[]{\label{fig:ROCdisplZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacementZOOM.pdf}}
-% %	\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus.pdf}}
-	% \subfigure[]{\label{fig:ROCdefocusZOOM} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocusZOOM.pdf}}
-% %	\subfigure[]{\label{fig:ROCdispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement.pdf}}
-	% \caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
-	% \label{fig:ROC}
-% \end{figure}
+%
+%% \subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
+%
+%
+%\subsection{Performance Assessment}
+%\gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
+%
+%\gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
+Experimental results are shown in Figures \ref{fig:ROCdispl_luma}, \ref{fig:ROCdispl_fd}, \ref{fig:ROCdef_grad}, \ref{fig:ROCdef_fd}.
 
 \begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{Immagini/ROCdisplacement_luma}
-	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
-	\label{fig:ROCdispl_luma}
+\centering
+\subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_luma}}
+\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_fd}}
+\caption{Examples of synthetically generated tampering events. \textbf{(a)} Defocus generated with gaussian filters on frames \textit{d} and \textit{e}. \textbf{(b)} Displacement created doing concatenation of similar sequences on frames \textit{d} and \textit{e}.}
+\label{fig:buenosAiresTamp}
 \end{figure}
 
 \begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{Immagini/ROCdisplacement_fd}
-	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
-	\label{fig:ROCdispl_fd}
+\centering
+\subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus1}}
+\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus_fd}}
+\caption{Examples of synthetically generated tampering events. \textbf{(a)} Defocus generated with gaussian filters on frames \textit{d} and \textit{e}. \textbf{(b)} Displacement created doing concatenation of similar sequences on frames \textit{d} and \textit{e}.}
+\label{fig:buenosAiresTamp}
 \end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus1}
-	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
-	\label{fig:ROCdispl_luma}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus_fd}
-	\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. In Figure \ref{fig:neve} there is an occlusion due to some snow on the camera lens, while in Figure \ref{fig:pioggia} there is a blur due to rain drops on the camera lens.}
-	\label{fig:ROCdispl_luma}
-\end{figure}
-
-%\begin{figure}
-%\centering
-%\includegraphics[width=0.7\linewidth]{Immagini/ROCdefocus_cropped.pdf}
-%\caption{Defocus}
-%\label{fig:ROCdefocus}
-%\end{figure}
 
 \subsection{Discussion}
 \gi{Adiano: Aggiungi qua la complessit\'a computazionale}
