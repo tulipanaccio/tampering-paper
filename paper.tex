@@ -3,6 +3,7 @@
 \usepackage{amssymb}
 \setcounter{tocdepth}{3}
 \usepackage{graphicx}
+\usepackage[table,xcdraw]{xcolor}
 \usepackage[ruled]{algorithm2e}
 %\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 \usepackage{amssymb}
@@ -35,7 +36,7 @@
 \begin{abstract}
 A desirable feature for smart cameras is the ability to autonomously detect any tampering event/attack that would prevents a clear view over the monitored scene. No matter whether tampering is due to atmospheric phenomena (e.g., few rain drops over the camera lens) or to malicious attack (e.g., the device displacement), these have to be promptly detected to possibly activate countermeasures. Tampering detection becomes particularly challenging in battery-powered cameras, where it is not possible to acquire images at video-like frame-rates, nor use sophisticated image-analysis algorithms. 
 
-We here introduce a tampering-detection algorithm that has been specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous indicator is detected as a tampering attempt. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image during the algorithm-configuration phase, and which shows to substantially improve the detection of camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one frame every minute, and at a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
+We here introduce a tampering-detection algorithm that has been specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous indicator is detected as a tampering attempt. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image \ad{Giacomo: scene al posto di image??} during the algorithm-configuration phase, and which shows to substantially improve the detection of camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one frame every minute, and at a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
 
 
 \keywords{tampering detection, defocus, displacement detection}
@@ -227,27 +228,27 @@ l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{R_k} z_t(x) }{|{R_k}|}\\
 \end{equation}
 
 
-\begin{equation}
-\label{eq:energyLuma}
-l(t) = \mathcal{L}[z_t] =\frac{\sum_{\mathcal{X}} z_t(x) }{|\mathcal{X}|} ,
-\end{equation}  
-
-
-\begin{equation}
-\label{eq:gradientDetr}
-\frac{\partial g}{\partial t}(t) = g(t) - g(t-1),
-\end{equation}
-
-
-\begin{equation}
-\label{eq:lumaDetr}
-\frac{\partial l}{\partial t}(t) = l(t) - l(t-1).
-\end{equation}
+%\begin{equation}
+%\label{eq:energyLuma}
+%l(t) = \mathcal{L}[z_t] =\frac{\sum_{\mathcal{X}} z_t(x) }{|\mathcal{X}|} ,
+%\end{equation}  
+%
+%
+%\begin{equation}
+%\label{eq:gradientDetr}
+%\frac{\partial g}{\partial t}(t) = g(t) - g(t-1),
+%\end{equation}
+%
+%
+%\begin{equation}
+%\label{eq:lumaDetr}
+%\frac{\partial l}{\partial t}(t) = l(t) - l(t-1).
+%\end{equation}
 
 FRAME DIFFERENCE:
 \begin{equation}
 	\label{eq:frameDiffReg}
-	\varphi_k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
+	\varphi^k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
 \end{equation}
 
 \subsection{Outlier Detection}\label{subsec:MonitoringScheme}
@@ -378,7 +379,7 @@ defocus has been simulated using gaussian filters (\ref{fig:sequences}(b)), whil
 In some cases these sequences contained real tampering events, as in Figure \ref{fig:sequences}(d).\\
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.9\linewidth]{Immagini/sequenze}
+\includegraphics[width=1\linewidth]{Immagini/sequenze}
 \caption{Sequences taken from webcams: \textbf{(a)} no tampering events; \textbf{(b)} defocus event on 4-th and 5-th frames, created using gaussian filtering; \textbf{(c)} displacement event on 4-th and 5-th frames, created using concatenation between similar sequences; \textbf{(d)} real displacement event on 4-th frame.}
 \label{fig:sequences}
 \end{figure}
@@ -430,6 +431,41 @@ As we could see there is an improvement, in the detection of camera displacement
 On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitoring indicators meant to detect blur/defocus, it is more convenient to consider the whole scene at once.
 \subsection{Discussion}
 \gi{Adriano: Aggiungi qua la complessit\'a computazionale}
+% Please add the following required packages to your document preamble:
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[tbh]
+\centering
+\begin{tabular}{l|l|l|l|l|l|l|}
+\cline{2-7}
+& \multicolumn{3}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{Displacement Detection}}  & \multicolumn{3}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{Defocus Detection}} \\ \cline{2-7} 
+& \cellcolor[HTML]{EFEFEF}\textbf{Regions} & \cellcolor[HTML]{EFEFEF}\textbf{Total} & \cellcolor[HTML]{EFEFEF}\textbf{Voronoi} & \cellcolor[HTML]{EFEFEF}\textbf{Regions} & \cellcolor[HTML]{EFEFEF}\textbf{Total} & \cellcolor[HTML]{EFEFEF}\textbf{Voronoi} \\ \hline
+\multicolumn{1}{|l|}{\cellcolor[HTML]{EFEFEF}\textbf{Luma}}     & 0.9994 & 0.9989 & 0.9985  &            &            &             \\ \hline
+\multicolumn{1}{|l|}{\cellcolor[HTML]{EFEFEF}\textbf{Gradient}} &  		 &  		  &             & 0.9895 & 0.9996 & 0.9996  \\ \hline
+\multicolumn{1}{|l|}{\cellcolor[HTML]{EFEFEF}\textbf{FD}}         & 0.9974 & 0.9944 & 0.9974  & 0.5526 & 0.5322 & 0.5391  \\ \hline
+\end{tabular}
+\caption{Area under curve of the analized solutions}
+\label{tab:AUC}
+\end{table}
+
+Numero di operazioni richieste:
+Calcolo di g(t):
+\begin{itemize}
+\item Norma gradiente: 196 FLOP per pixel
+\item Media delle norme del gradiente
+\end{itemize}
+Calcolo di l(t):
+\begin{itemize}
+\item Media dei valori di grigio
+\item Detrending: 1 FLOP per frame
+\end{itemize}
+Monitoraggio one-shot: 2 confronti
+%Monitoraggio sequenziale: 
+%Ogni 20 frame
+%Calcolo intervalli di confidenza: ~70 FLOP
+%Confronto tra intervalli di confidenza: 2 confronti
+
+
 
 \section{Conclusion}\label{sec:Conclusion}
 \gi{Adriano: butta in inglese gli ongoing works (come ultima cosa)}
