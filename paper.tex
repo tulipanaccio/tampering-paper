@@ -448,18 +448,20 @@ On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitorin
 \label{tab:AUC}
 \end{table}
 
-Numero di operazioni richieste:
-Calcolo di g(t):
-\begin{itemize}
-\item Norma gradiente: 196 FLOP per pixel
-\item Media delle norme del gradiente
-\end{itemize}
-Calcolo di l(t):
-\begin{itemize}
-\item Media dei valori di grigio
-\item Detrending: 1 FLOP per frame
-\end{itemize}
-Monitoraggio one-shot: 2 confronti
+The algorithm uses low computational techniques: the biggest effort is made by computation of the feature $g(t)$, which needs $34$ operations per pixel, due to the Sobel filter used during the convolution.
+
+%Numero di operazioni richieste:
+%Calcolo di g(t):
+%\begin{itemize}
+%\item Norma gradiente: 34 FLOP per pixel
+%\item Media delle norme del gradiente
+%\end{itemize}
+%Calcolo di l(t):
+%\begin{itemize}
+%\item Media dei valori di grigio
+%\item Detrending: 1 FLOP per frame
+%\end{itemize}
+%Monitoraggio one-shot: 2 confronti
 %Monitoraggio sequenziale: 
 %Ogni 20 frame
 %Calcolo intervalli di confidenza: ~70 FLOP
