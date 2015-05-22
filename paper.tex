@@ -335,7 +335,7 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 %	\label{alg:DEFOCUS}
 %\end{algorithm}
 
-\begin{algorithm}[tp]
+\begin{algorithm}[t]
 	% \SetAlgoNoLine
 	\LinesNumbered
 	\SetAlgoNlRelativeSize{0}
@@ -376,7 +376,7 @@ The proposed algorithm has been implemented in MATLAB, and has been tested on tw
 The first one refers to frame sequences taken from webcams recording some parts of cities (as in Figure \ref{fig:sequences}(a)), where we have introduced some synthetically generated tampering events:
 defocus has been simulated using gaussian filters (\ref{fig:sequences}(b)), while displacement has been created with concatenation of similar frame sequences (Figure \ref{fig:sequences}(c)).
 In some cases these sequences contained real tampering events, as in Figure \ref{fig:sequences}(d).\\
-\begin{figure}
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.9\linewidth]{Immagini/sequenze}
 \caption{Sequences taken from webcams: \textbf{(a)} no tampering events; \textbf{(b)} defocus event on 4-th and 5-th frames, created using gaussian filtering; \textbf{(c)} displacement event on 4-th and 5-th frames, created using concatenation between similar sequences; \textbf{(d)} real displacement event on 4-th frame.}
@@ -410,14 +410,14 @@ In particular the alternative approaches that we have considered working:
 %\gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
 %
 %\gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
-\begin{figure}
+\begin{figure}[htb]
 \centering
 \subfigure[]{\label{fig:ROCdisplacement_luma}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_luma}}
 \subfigure[]{\label{fig:ROCdisplacement_fd} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_fd}}
 \caption{ROC curves for displacement detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean luma energy. \textbf{(b)} Analysis of the frame differencing.}
 \label{fig:ROCdisplacement}
 \end{figure}
-\begin{figure}
+\begin{figure}[htb]
 \centering
 \subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus1}}
 \subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus_fd}}
