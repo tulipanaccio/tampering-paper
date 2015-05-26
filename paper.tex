@@ -163,17 +163,6 @@ To obtain indicators that in normal conditions can be treated as i.i.d. realizat
 \end{equation}
 and we similarly define $\partial g(t)$. Detrended indicators are more suitable to be monitored by a confidence interval since, as shown in Figure \ref{fig:indicatori}(b). However, a tampering yielding permanent changes in the indicators, as those in Figure \ref{fig:indicatori}(a) results in a single outlier in the detrended indicator~\eqref{eq:detrending}. 
 
-\begin{figure}[tb]
-\centering
-\label{fig:indicatori} 
-\includegraphics[width=1\linewidth]{Immagini/indicatori}
-\caption{Behavior of the average norm of the gradient \textbf{(a)} and its detrending \textbf{(b)} in a sequence with a defocus event.
-The tampering event come at $t = 600$.
-As illustrated in \textbf{(a)}, even in the case in which there aren't tampering events, there is nonstationarity.
-Detrending is done in order to preserve stationarity in normal situations.
-Considering the detrending \textbf{(b)} persistent changes become instantaneous:
-in particular there is a peak in the instant in which tampering begins.}
-\end{figure}
 
 We perform outlier detection by defining confidence regions for our indicator in tampering-free frames. In practice, since all these are scalar indicators, it is enough to compute the indicator mean ($\overline{\partial l}_k(t), k = 1,\dots,K$ and $\overline{\partial g}(t)$) and standard deviations ($\sigma_{l_k}, k = 1,\dots,K$ and $\sigma_g$) over the tampering-free frames provided for training, namely $z_t\,, t = 1, \dots, T_o$. Confidence regions are then defined as 
 \begin{equation}\label{eq:confidenceRegions}
