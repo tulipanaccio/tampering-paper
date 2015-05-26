@@ -219,6 +219,12 @@ dove:
 \end{itemize}
 
 
+When the feature vectors are computed for all the pixels we start the segmentation phase.
+This is made using classical clustering techniques:
+in particular we use a modified version of the classical k-means algorithm \cite{han2006data}. 
+In this implementation, each feature vector belongs to a cluster if its \textit{weighted Minkowski distance} \cite{de2012minkowski} from the cluster's centroid is minimum with respect to the distance from the other centroids. 
+The distance is weighted considering the standard deviation of each elements of the feature vectors inside each cluster \cite{kottke1994motion}, in order to consider, during the clustering, also the contribute of the fields which have low variance. \ad{Giacomo: prova a vedere se si capisce cosa voglio dire in queste frasi!!!}
+
 
 \section{Experiments}\label{sec:experiments}
 The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
