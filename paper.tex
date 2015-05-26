@@ -34,9 +34,9 @@
 \maketitle
 
 \begin{abstract}
-A desirable feature for smart cameras is the ability to autonomously detect any tampering event/attack that would prevents a clear view over the monitored scene. No matter whether tampering is due to atmospheric phenomena (e.g., few rain drops over the camera lens) or to malicious attack (e.g., the device displacement), these have to be promptly detected to possibly activate countermeasures. Tampering detection becomes particularly challenging in battery-powered cameras, where it is not possible to acquire images at video-like frame-rates, nor use sophisticated image-analysis algorithms. 
+A desirable feature for smart cameras is the ability to autonomously detect any tampering event/attack that would prevent a clear view over the monitored scene. No matter whether tampering is due to atmospheric phenomena (e.g., few rain drops over the camera lens) or to malicious attacks (e.g., the device displacement), these have to be promptly detected to possibly activate countermeasures. Tampering detection becomes particularly challenging in battery-powered cameras, where it is not possible to acquire images at video-like frame-rates, nor use sophisticated image-analysis algorithms. 
 
-We here introduce a tampering-detection algorithm that has been specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous indicator is detected as a tampering attempt. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image \ad{Giacomo: scene al posto di image??} during the algorithm-configuration phase, and which shows to substantially improve the detection of camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one frame every minute, and at a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
+We here introduce a tampering-detection algorithm that has been specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous indicator is detected as a tampering attempt. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image during the algorithm-configuration phase, and which shows to substantially improve the detection of camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one frame every minute, and at a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
 
 
 \keywords{tampering detection, defocus, displacement detection}
@@ -50,39 +50,34 @@ We here introduce a tampering-detection algorithm that has been specifically des
 %We here address the problem of detecting tampering events/attacks in camera devices, and in particular those preventing the proper acquisition of the monitored scene. 
 
 % What is the problem?
-When cameras operate outdoor and in harsh environments, dust, rain drops or snow flakes might lie on the camera lens resulting in blurry pictures, as in Fig. \ref{fig:pioggia}, or in partial occlusions of the scene, as in Fig. \ref{fig:neve}. Similarly, other intentional attacks like displacing the camera, changing its focus, or spraying some opaque or glossy liquid over the lenses, would result in heavily compromised pictures, that would be surely useless for monitoring purposes. We refer to these events/attacks as tampering. In some cases, tampering is easy to detect, e.g., when the camera integrity is affected and the device goes out-of-order. However, in many other situations, namely when the device is not physically damaged,	 but the correct interpretation of the scene or of small important details is prevented (e.g., the identification of licence plates), tampering detection is not straightforward and requires image-analysis algorithms.
+When cameras operate outdoor and in harsh environments, dust, rain drops or snow flakes might lie on the camera lens resulting in blurry pictures, as in Fig. \ref{fig:pioggia}, or in partial occlusions of the scene, as in Fig. \ref{fig:neve}. Similarly, intentional attacks like displacing the camera, changing its focus, or spraying some opaque or glossy liquid over the lenses, would result in heavily compromised pictures, that would be surely useless for monitoring purposes. We refer to these events/attacks as tampering. In some cases, tampering is easy to detect, e.g., when the camera integrity is affected and the device goes out-of-order. However, in many other situations, namely when the device is not physically damaged, tampering detection is not straightforward, and sometimes image analysis is the only viable option. 
 
 % Why is it interesting and important?
-The early detection of tampering events/attacks is clearly essential in surveillance systems \gi{Adriano, add REFERENCES} \cite{hampapur2005smart}, where cameras are expected to autonomously detect any tampering event/attack and promptly report alerts. Surveillance cameras are typically connected to the power supply and acquire and process images at normal frame-rates (e.g. around few frames per second). In these conditions, several algorithms have been presented in the literature \gi{Adriano add REFERENCES}.  
+Tampering prevents the correct scene interpretation and causes the loss of small, important details such as licence plates. Tampering detection is therefore an essential feature in surveillance systems~\cite{hampapur2005smart}, where cameras are expected to autonomously detect any tampering, and promptly reporting alerts. Surveillance cameras are typically connected to the power supply and operates at normal frame-rates (e.g. around few frames per second): in these conditions, several tampering-detection algorithms have been presented~\gi{Adriano add REFERENCES}.  
 
 \gi{Qui ST pu\'o aggiungere qualche esempio di applicazione qui o menzionare dispositivi di riferimento (con tanto di link a datasheet). Magari aggiungendo che le batterie recenti permettono operativit\'a di due anni a questi regimi.}\cl{Verifico cosa possiamo dire del SecSoc.}
-This work expressly targets low-power and ultra-low-power smart cameras. Such devices typically operate at very low frame-rates (e.g. possibly less than one frame every minute), with constrained computational power and memory, and are battery powered (typically lasting one or two years). 
-% We here consider low-power cameras, which are battery powered and that have to operate at very low frame-rates (e.g. one frame every minute or more) and which have a constrained computational power or memory availability.
-As an example, consider Wireless Multimedia Sensor Networks (WMSN) \cite{akyildiz2007survey} where nodes are wirelessy connected smart-cameras, that can acquire and transmit images at regular time interval or upon requests. Often, in WMSN, the units are not connected to the power supply and have to operate with batteries, possibly implementing energy harvesting mechanisms \gi{REFERENCES, magari riprescando quelle del paper di TIM}. Even though these devices are not employed in critical surveillance applications, low-power smart cameras are becoming popular in distributed monitoring of wide environments due to their low cost and maintenance requirements \gi{possiamo mettere qualche REFERENCE}. Tampering detection is thus very important in low-power smart cameras, also considering that tampered frames should be identified to avoid unnecessary energy-demanding operations like the local processing or radio activation for transmission over the network.
+%
+In this work we expressly target low-power and ultra-low-power smart cameras, devices that operate at very low frame-rates (e.g. possibly less than one frame every minute), that are characterized by a constrained computational power and memory, and that are battery powered (typically lasting one or two years). As an example, consider Wireless Multimedia Sensor Networks (WMSN) \cite{akyildiz2007survey} where nodes are wirelessy connected smart-cameras, that can acquire and transmit images at regular time interval or upon requests. Often, in WMSN, the units are not connected to the power supply and have to operate with batteries and possibly rely on energy harvesting mechanisms~\gi{REFERENCES, Adriano, guarda se c'e' qualche reference dal nostro paper di TIM}. Therefore, the power consumption is a serious concern in these devices.
 
+Even though low-power and ultra-low-power cameras not employed in critical surveillance applications, these devices are becoming popular in distributed systems for monitoring wide environments due to their low cost and maintenance requirements \gi{Adriano, Claudio, possiamo mettere qualche REFERENCE?}. Tampering detection is therefore very important in low-power smart cameras, where the algorithm are expected to be particularly prompt and have low false-alarm rates to prevent unnecessary energy-demanding operations like the local processing or radio activation for transmitting corrupted images (or false alarms) over the network. Unfortunately, tampering detection in such a resource-constrained scenario, has been much less investigated.
 
 % Why is it hard? (E.g., why do naive approaches fail?)
-Tampering detection in low-power smart cameras is much more challenging than in conventional surveillance cameras \cite{perrig2004security}. Beside computational aspects -- such as the number of operations per pixels allowed -- the big issue is that low-power smart cameras typically operate at very low-frame rates (e.g., less than one frame per minute), and the acquired sequence does not evolve smoothly. This prevents the use of learned background models and the analysis of foreground variations \cite{piccardi2004background}. When dynamic environments are acquired at low frame rates, like the example depicted in Fig. \ref{fig:buenosAires}, two consecutive frames might be very different because of changes in the scene and in the light conditions: smart cameras have to correctly distinguish between these \emph{normal} changes and changes due to camera displacement or blur/defocus. Moreover, in low-power smart cameras, tampering has to be reliably detected because false alerts would lead to unnecessary energy waste.
+Tampering detection in low-power smart cameras is much more challenging than in conventional surveillance cameras~\cite{perrig2004security}. Beside computational aspects -- such as the number of operations per pixels allowed -- the big issue is that low-power smart cameras typically operate at very low-frame rates (e.g., less than one frame per minute), thus the acquired sequence does not evolve smoothly. This prevents the use of learned background models and the analysis of foreground variations \cite{piccardi2004background}. When dynamic environments are acquired at low frame rates, two consecutive frames might be very different because of changes in the scene and in the light conditions, resulting in sequences those depicted in Figure~\ref{fig:sequences}: smart cameras have to correctly distinguish between these \emph{normal} changes and changes due to camera tampering. 
 
 % We here address the problem of detecting tampering events on a camera device that is employed for monitoring purpose. Tampering events can be due to malicious attacks, as for instance a displacement of the camera or spraying some dirty liquid that would prevent the acquisition of (part of) the monitored scene or the interpretation of the content (e.g., the identification of licence plates). 
 
-
 %What are the key components of my approach and results? Also include any specific limitations.
-This work presents an algorithm to detect both camera defocus and displacement, as stated in Section \ref{sec:probForm}. The algorithm relies on simple indicators that are computed with a low computational complexity (Section \ref{subsec:Indicators}) and leverages an outlier detection technique to detect frames yielding anomalous indicators as related to a tampering event (Section \ref{subsec:MonitoringScheme}). In particular, we perform a preliminarily partitioning of the scene into nonoverlapping regions, and separately compute and monitor indicators over different regions. Scene partitioning is defined by clustering feature vectors gathering the indicators in different pixels, thus performing a very coarse segmentation of the image (Section \ref{subsec:Segmentation}). Regions are computed during the initial configuration of the algorithm and as such do not implies any computational overhead w.r.t. operating on the whole image. Our experiments in Section \ref{sec:experiments} show that regions substantially improve the detection of camera displacements, while when monitoring indicators meant to detect blur/defocus, it is more convenient to consider the whole scene at once. Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
-
+We present an algorithm to detect both camera defocus and displacement, as stated in Section \ref{sec:probForm}. The algorithm presented in Section~\ref{sec:Algorithm} relies on two indicators: the average image intensity to detect displacement, and the average gradient norm, to detect blur. These indicators can be easily computed and monitored by an outlier-detection technique to detect the respective tampering. We show that displacement-detection performance can be improved by means of a preliminarily partitioning of the scene into nonoverlapping regions, and then separately computing and monitoring the average intensity over different regions (Section \ref{subsec:Segmentation}). Remarkably, these regions need to be defined during an initial configuration phase of the smart camera, thus there is no relevant computational overhead w.r.t. monitoring the whole image. Experiments in Section \ref{sec:experiments} show that operating on image regions can substantially improve the detection of camera displacements. Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
 
 \begin{figure}[t!]
 \centering
 \subfigure[]{\label{fig:pioggia} \includegraphics[width=0.4\linewidth]{Immagini/pioggia}}
 \subfigure[]{\label{fig:neve} \includegraphics[width=0.4\linewidth]{Immagini/neve}}
-\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. \textbf{(a)} Blur due to rain drops on the camera lens. \textbf{(b)} Occlusion due to some snow on the camera lens.}
+\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. \textbf{(a)} Blur due to rain drops on the camera lens. \textbf{(b)} Occlusion due to snow on the camera lens.}
 \label{fig:tampering}
 \end{figure}
 
 
-
-
- 
 \subsection{Related Works}\label{subsec:relWorks}
 % Why hasn't it been solved before? (Or, what's wrong with previous proposed solutions? How does mine differ?)
 The literature concerning tampering detection is mostly focused on video surveillance applications and operates at few frames per second \gi{Adriano, \'e vero?}. Background models are typically leveraged to identify defocus and occlusions; in particular  ~\cite{aksay2007camera} performs detect defocus by analyzing the wavelet domain of each frame and performs histogram comparison for detecting occlusions, while camera displacements are not considered. A background-subtraction technique is employed in~\cite{saglam2009real} to identify defocus, occlusions, and displacements. \gi{FIXME Comparison in the Fourier domain for defocus detection, histogram comparison for occlusion detection, comparison between current background and delayed background for displacement detection}. Background subtraction is also used in \cite{gil2007automatic} to detect defocus, occlusions, and displacements. \gi{FIXME Comparison of edges pixels count for defocus detection, entropy comparison for occlusion detection, block matching algorithm for displacement detection}.
@@ -91,11 +86,11 @@ In contrast, no background models are used in \cite{alippi2010detecting}, where 
 \cite{kryjak2012fpga}: implementation in a FPGA of a solution based on background modeling, histograms comparisons, edges comparisons.
 \cite{harasse2004automated}: tampering detection inside a moving vehicle; uses background subtraction methods in order to identify defocus, occlusions, and displacements. Comparison of edges pixels count for defocus detection, entropy comparison for occlusion detection, block matching algorithm for displacement detection.
 \cite{tsesmelis2013tamper}: monitoring of the number of key points extracted by SURF in order to detect defocus events, partition in blocks and HOG descriptors matching for each block in order to detect occlusions. These types of solutions requires a lot of computations
-
-
-
+%
+%
+%
 \section{Problem Formulation}\label{sec:probForm}
-
+%
 Let $z_t$ be the frame acquired at time $t$, which we model as
 \begin{equation}
 \label{eq:observationModel}
@@ -149,10 +144,44 @@ The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\
 %\[ z_t = w_t(x) + \eta(x), \forall x \in \mathcal{X} \mbox{, per } t \geq T^*. \]
 
 
-\section{Proposed Solution}\label{sec:propSol}
+\section{The Proposed Algorithm}\label{sec:propSol}
 
+The proposed tampering-detection algorithm relies on two indicators that are very easy to compute: the average intensity (also refer to \emph{luma} and denoted by $l$) and the average norm of the gradient (denoted by $g$). To analyze an incoming frame, we compute these indicators at first and then detect possible tampering attacks by determining whether these falls outside a confidence interval defined during an initial training phase.
 
-
+\begin{algorithm}[t]
+	% \SetAlgoNoLine
+	\LinesNumbered
+	\SetAlgoNlRelativeSize{0}
+	\SetNlSty{small}{}{.}
+	\textbf{Input}: $\gamma$, $T_{o}$, $\{R_k\}, k=1,\dots,K$ \\
+	\textbf{Configuration}:\\
+%	\lnl{DISPL-Tr1} Extract regions $\{\mathcal{R}_k\}, k=1,\dots,K$  \\
+	\lnl{DISPL-Tr2} \For{$t=1,\dots,T_{o}$}
+	{	\lnl{DISPL-Tr3} Get frame $z_t$ \\
+		\lnl{DISPL-Tr4} \For{$k=1,\dots,K$}{
+			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $R_k$\\
+		}
+	}
+	\lnl{DISPL-Tr6} \For{$k=1,\dots,K$}{
+		\lnl{DISPL-Tr7} Compute $\sigma_l^k$\\
+	}
+	\textbf{Operational phase}:\\
+	\lnl{DISPL-Test1} \For{$t=T_{o},\dots,\infty$}{
+		\lnl{DISPL-Test2} Get frame $z_t$ \\
+		\lnl{DISPL-Test3} $n_l = 0$ \\
+		\lnl{DISPL-Test4} \For{$k=1,\dots,K$}{
+			\lnl{DISPL-Test5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $R_k$\\
+			\lnl{DISPL-Test6} \If{$\partial l^k(t) < -\gamma \sigma_l^k \vee \partial l^k(t) > \gamma \sigma_l^k $}{
+				\lnl{DISPL-Test7} $n_l=n_l+1$\\
+			}
+		}
+		\lnl{DISPL-Test8} \If{$n_l\geq K-1$}{
+			\lnl{DISPL-Test9} $z_t$ is a tampered frame\\
+		}
+	}   
+	\caption{Tampering detection algorithm}
+	\label{alg:DISPL}
+\end{algorithm}
 
 \subsection{Scene Segmentation}\label{subsec:Segmentation}
 Consideriamo la sequenza $\{z_t\}$ di frame acquisiti dalla camera, con $t=1,\dots,T_{c}$.
@@ -182,8 +211,11 @@ dove:
 	\bar{z}(x)=\frac{\sum_{t=1}^{T_c}( z_t \circledast f)(x)}{T_c}.
 	\end{equation}
 \end{itemize}
+%
+%
+%
 \subsection{Indicators}\label{subsec:Indicators}
-\gi{Adriano: mettere formule degli indicatori e anche del frame difference qua}
+
 
 \begin{equation}
 \label{eq:gradientRegions}
@@ -336,40 +368,6 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 %	\label{alg:DEFOCUS}
 %\end{algorithm}
 
-\begin{algorithm}[t]
-	% \SetAlgoNoLine
-	\LinesNumbered
-	\SetAlgoNlRelativeSize{0}
-	\SetNlSty{small}{}{.}
-	\textbf{Input}: $\gamma$, $T_{o}$, $\{R_k\}, k=1,\dots,K$ \\
-	\textbf{Configuration}:\\
-%	\lnl{DISPL-Tr1} Extract regions $\{\mathcal{R}_k\}, k=1,\dots,K$  \\
-	\lnl{DISPL-Tr2} \For{$t=1,\dots,T_{o}$}
-	{	\lnl{DISPL-Tr3} Get frame $z_t$ \\
-		\lnl{DISPL-Tr4} \For{$k=1,\dots,K$}{
-			\lnl{DISPL-Tr5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $R_k$\\
-		}
-	}
-	\lnl{DISPL-Tr6} \For{$k=1,\dots,K$}{
-		\lnl{DISPL-Tr7} Compute $\sigma_l^k$\\
-	}
-	\textbf{Operational phase}:\\
-	\lnl{DISPL-Test1} \For{$t=T_{o},\dots,\infty$}{
-		\lnl{DISPL-Test2} Get frame $z_t$ \\
-		\lnl{DISPL-Test3} $n_l = 0$ \\
-		\lnl{DISPL-Test4} \For{$k=1,\dots,K$}{
-			\lnl{DISPL-Test5} Compute $l^k(t)$, $\partial l^k(t)$ for the region $R_k$\\
-			\lnl{DISPL-Test6} \If{$\partial l^k(t) < -\gamma \sigma_l^k \vee \partial l^k(t) > \gamma \sigma_l^k $}{
-				\lnl{DISPL-Test7} $n_l=n_l+1$\\
-			}
-		}
-		\lnl{DISPL-Test8} \If{$n_l\geq K-1$}{
-			\lnl{DISPL-Test9} $z_t$ is a tampered frame\\
-		}
-	}   
-	\caption{Tampering detection algorithm}
-	\label{alg:DISPL}
-\end{algorithm}
 %\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
@@ -449,7 +447,6 @@ On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitorin
 \end{table}
 
 The algorithm uses low computational techniques: the biggest effort is made by computation of the feature $g(t)$, which needs $34$ operations per pixel, due to the Sobel filter used during the convolution.
-The computational load could decrease using Fast Fourier Transform (FFT) \cite{brigham1988fast} and operating in the frequency domain.
 
 %Numero di operazioni richieste:
 %Calcolo di g(t):
