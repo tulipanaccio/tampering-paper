@@ -143,7 +143,19 @@ g(t) = \sum_X \left (\sqrt{\left(z_t \circledast f_h\right)^2(x) + \left(z_t \ci
 \end{equation}
 where $f_h$ and $f_h$ are the horizontal and vertical derivative filters, respectively, $\#(\cdot)$ indicates the cardinality of a set and $\circledast$ the 2d convolution.
 
-As shown in Figure REFERENCE\_TODO.a), tampering results in outliers in the sequence of indicators. Detecting these outliers is not straightforward, since indicators heavily fluctuates in normal conditions because of short-term variations in the depicted scene or illumination changes. For outlier-detection purposes~\cite{Chandola2009}, it is more convenient to operate on sequences of independent and identically distributed (i.i.d.) values, where outliers can be detected by density-based methods or simply by confidence regions that is what we considered in our algorithm. Unfortunately, trends or deterministic variations in the indicator sequences are not easy to compensate because of unpredictable evolutions of the scene. 
+\begin{figure}[tb]
+\centering
+\label{fig:indicatori} 
+\includegraphics[width=1\linewidth]{Immagini/indicatori}
+\caption{Behavior of the average norm of the gradient \textbf{(a)} and its detrending \textbf{(b)} in a sequence with a defocus event.
+The tampering event come at $t = 600$.
+As illustrated in \textbf{(a)}, even in the case in which there aren't tampering events, there is nonstationarity.
+Detrending is done in order to preserve stationarity in normal situations.
+Considering the detrending \textbf{(b)} persistent changes become instantaneous:
+in particular there is a peak in the instant in which tampering begins.}
+\end{figure}
+
+As shown in Figure \ref{fig:indicatori}(a), tampering results in outliers in the sequence of indicators. Detecting these outliers is not straightforward, since indicators heavily fluctuates in normal conditions because of short-term variations in the depicted scene or illumination changes. For outlier-detection purposes~\cite{Chandola2009}, it is more convenient to operate on sequences of independent and identically distributed (i.i.d.) values, where outliers can be detected by density-based methods or simply by confidence regions that is what we considered in our algorithm. Unfortunately, trends or deterministic variations in the indicator sequences are not easy to compensate because of unpredictable evolutions of the scene. 
 
 To obtain indicators that in normal conditions can be treated as i.i.d. realizations of a random variable we, detrend~\cite{Gustafsson2000} the indicator sequence by a temporal derivative
 \begin{equation}\label{eq:detrending}
