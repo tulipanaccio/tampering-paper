@@ -449,6 +449,7 @@ On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitorin
 \end{table}
 
 The algorithm uses low computational techniques: the biggest effort is made by computation of the feature $g(t)$, which needs $34$ operations per pixel, due to the Sobel filter used during the convolution.
+The computational load could decrease using Fast Fourier Transform (FFT) \cite{brigham1988fast} and operating in the frequency domain.
 
 %Numero di operazioni richieste:
 %Calcolo di g(t):
