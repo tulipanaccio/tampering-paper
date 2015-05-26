@@ -146,7 +146,28 @@ The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\
 
 \section{The Proposed Algorithm}\label{sec:propSol}
 
-The proposed tampering-detection algorithm relies on two indicators that are very easy to compute: the average intensity (also refer to \emph{luma} and denoted by $l$) and the average norm of the gradient (denoted by $g$). To analyze an incoming frame, we compute these indicators at first and then detect possible tampering attacks by determining whether these falls outside a confidence interval defined during an initial training phase.
+The proposed tampering-detection algorithm is illustrated in Algorithm \ref{alg:DISPL}, and relies on two indicators that are very simple to compute: the average intensity (also referred to as \emph{luma} and denoted by $l$) and the average norm of the gradient (denoted by $g$). As anticipated in Section \ref{sec:introduction}, during algorithm configuration we perform a preliminary segmentation of the scene, yielding $\{R_k\}, k = 1,\dots,K,$  $R_k \subset \mathcal{X}$, a collection of disjoint subsets ($R_i  \cap R_j = \emptyset, \forall i \neq j$), and we compute and monitor the luma indicator separately on each $R_k$. Details about the scene segmentation algorithm used are reported in Section \ref{subsec:Segmentation}. 
+
+Luma is computed separately on each of the $K$ image regions in each frame $z_t$
+\begin{equation}\label{eq:lumaRegions}
+l_k(t) =\frac{1}{\#R_k} \sum_{R_k} z_t(x), \ \ k = 1, \dots, K\,,
+\end{equation}
+while the gradient norm is
+\begin{equation}
+\label{eq:normaGradiente}
+g(t) = \sum_X \left (\sqrt{\left(z_t \circledast f_h\right)^2(x) + \left(z_t \circledast f_v\right)^2(x)}\right),
+\end{equation}
+where $f_h$ and $f_h$ are horizontal and vertical derivative filters, respectively, $\#(\cdot)$ indicates the cardinality of a set and $\circledast$ the 2d convolution.
+
+Tampering attacks are analyzed by determining whether indicators computed from each incoming frame yield an outlier. Since these indicator are univariate, we simply 
+
+
+Monitoring these indicators is challenging because they are highly correlated overtime and and it is not possible to 
+%\partial l^k(t) & =& l^k(t)-l^k(t-1) 
+
+
+
+
 
 \begin{algorithm}[t]
 	% \SetAlgoNoLine
@@ -155,7 +176,7 @@ The proposed tampering-detection algorithm relies on two indicators that are ver
 	\SetNlSty{small}{}{.}
 	\textbf{Input}: $\gamma$, $T_{o}$, $\{R_k\}, k=1,\dots,K$ \\
 	\textbf{Configuration}:\\
-%	\lnl{DISPL-Tr1} Extract regions $\{\mathcal{R}_k\}, k=1,\dots,K$  \\
+%	\lnl{DISPL-Tr1} Extract regions $\{R_k\}, k=1,\dots,K$  \\
 	\lnl{DISPL-Tr2} \For{$t=1,\dots,T_{o}$}
 	{	\lnl{DISPL-Tr3} Get frame $z_t$ \\
 		\lnl{DISPL-Tr4} \For{$k=1,\dots,K$}{
@@ -216,7 +237,6 @@ dove:
 %
 \subsection{Indicators}\label{subsec:Indicators}
 
-
 \begin{equation}
 \label{eq:gradientRegions}
 \begin{array}{ccc}
@@ -241,23 +261,13 @@ h(i,j)=\frac{1}{2\pi\sigma^2}\exp\left(-\frac{i^2+j^2}{2\sigma^2}\right),
 \end{equation}
 e ponendo il valore massimo di questa funzione nel centro del filtro.
 Con questi filtri \`e possibile calcolare la \textit{norma del gradiente} nel seguente modo:
-\begin{equation}
-\label{eq:normaGradiente}
-\| \nabla z_t(x) \|_2^2=\left(z_t \circledast f_h\right)(x)^2 + \left(z_t \circledast f_v\right)(x)^2.
-\end{equation}
+
 Una volta calcolata la norma del gradiente \`e possibile farne la media come specificato in \eqref{eq:energyGradient}.
 Il risultato finale \`e un indicatore \textit{scalare} per ciascun frame acquisito, che pu\`o essere monitorato per individuare eventi di sfocature. 
 In particolare ci aspettiamo che l'evento di sfocatura provochi un abbattimento del valore di $g$.
 
 
 
-\begin{equation}
-\label{eq:lumaRegions}
-\begin{array}{ccc}
-l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{R_k} z_t(x) }{|{R_k}|}\\
-\partial l^k(t) & =& l^k(t)-l^k(t-1) 
-\end{array},
-\end{equation}
 
 
 %\begin{equation}
@@ -276,12 +286,6 @@ l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{R_k} z_t(x) }{|{R_k}|}\\
 %\label{eq:lumaDetr}
 %\frac{\partial l}{\partial t}(t) = l(t) - l(t-1).
 %\end{equation}
-
-FRAME DIFFERENCE:
-\begin{equation}
-	\label{eq:frameDiffReg}
-	\varphi^k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
-\end{equation}
 
 \subsection{Outlier Detection}\label{subsec:MonitoringScheme}
 
@@ -401,6 +405,13 @@ In particular the alternative approaches that we have considered working:
 \item considering adaptive region, as described in Section \ref{sec:propSol}, for the feature computation;
 \item considering voronoi regions \cite{aurenhammer1991voronoi}, which are easier to compute with respect to our solution but don't consider the scene content, for the feature computation.
 \end{itemize}
+
+FRAME DIFFERENCE:
+\begin{equation}
+	\label{eq:frameDiffReg}
+	\varphi^k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
+\end{equation}
+
 %
 %% \subsection{Alternative Approaches}\label{subsec:AlternativeApproaches}
 %
