@@ -57,6 +57,14 @@ We here introduce a tampering-detection algorithm that has been specifically des
 % What is the problem?
 When cameras operate outdoor and in harsh environments, dust, rain drops or snow flakes might lie on the camera lens resulting in blurry pictures, as in Fig. \ref{fig:pioggia}, or in partial occlusions of the scene, as in Fig. \ref{fig:neve}. Similarly, intentional attacks like displacing the camera, changing its focus, or spraying some opaque or glossy liquid over the lenses, would result in heavily compromised pictures, that would be surely useless for monitoring purposes. We refer to these events/attacks as tampering. In some cases, tampering is easy to detect, e.g., when the camera integrity is affected and the device goes out-of-order. However, in many other situations, namely when the device is not physically damaged, tampering detection is not straightforward, and sometimes image analysis is the only viable option. 
 
+\begin{figure}[t!]
+\centering
+\subfigure[]{\label{fig:pioggia} \includegraphics[width=0.4\linewidth]{Immagini/pioggia}}
+\subfigure[]{\label{fig:neve} \includegraphics[width=0.4\linewidth]{Immagini/neve}}
+\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. \textbf{(a)} Blur due to rain drops on the camera lens. \textbf{(b)} Occlusion due to snow on the camera lens.}
+\label{fig:tampering}
+\end{figure}
+
 % Why is it interesting and important?
 Tampering prevents the correct scene interpretation and causes the loss of small, important details such as licence plates. Tampering detection is therefore an essential feature in surveillance systems~\cite{hampapur2005smart}, where cameras are expected to autonomously detect any tampering, and promptly reporting alerts. Surveillance cameras are typically connected to the power supply and operates at normal frame-rates (e.g. around few frames per second): in these conditions, several tampering-detection algorithms have been presented~\gi{Adriano add REFERENCES}.  
 
@@ -74,13 +82,7 @@ Tampering detection in low-power smart cameras is much more challenging than in 
 %What are the key components of my approach and results? Also include any specific limitations.
 We present an algorithm to detect both camera defocus and displacement, as stated in Section \ref{sec:probForm}. The algorithm presented in Section~\ref{sec:propSol} relies on two indicators: the average image intensity to detect displacement, and the average gradient norm, to detect blur. These indicators can be easily computed and monitored by an outlier-detection technique to detect the respective tampering. We show that displacement-detection performance can be improved by means of a preliminarily partitioning of the scene into nonoverlapping regions, and then separately computing and monitoring the average intensity over different regions (Section \ref{subsec:Segmentation}). Remarkably, these regions need to be defined during an initial configuration phase of the smart camera, thus there is no relevant computational overhead w.r.t. monitoring the whole image. Experiments in Section \ref{sec:experiments} show that operating on image regions can substantially improve the detection of camera displacements. Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
 
-\begin{figure}[t!]
-\centering
-\subfigure[]{\label{fig:pioggia} \includegraphics[width=0.4\linewidth]{Immagini/pioggia}}
-\subfigure[]{\label{fig:neve} \includegraphics[width=0.4\linewidth]{Immagini/neve}}
-\caption[Tampering examples]{Examples of tampering events due to atmospheric phenomena. \textbf{(a)} Blur due to rain drops on the camera lens. \textbf{(b)} Occlusion due to snow on the camera lens.}
-\label{fig:tampering}
-\end{figure}
+
 
 
 \subsection{Related Works}\label{subsec:relWorks}
@@ -405,21 +407,21 @@ FRAME DIFFERENCE:
 %\gi{Adriano: Dire come vengono calcolate le ROC curves TPR e FPR, le cifre di merito insomma, spiegando bene che parametro varia}
 %
 %\gi{Adriano: metti entrambe le ROC curves, affiancate e per bene ed alcuni esempi di sequenze}
-\begin{figure}[htb]
+\begin{figure}[t]
 \centering
-\subfigure[]{\label{fig:ROCdisplacement_luma}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_luma}}
-\subfigure[]{\label{fig:ROCdisplacement_fd} \includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement_fd}}
+\subfigure[]{\label{fig:ROCdisplacement}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement}}
+\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus}}
 \caption{ROC curves for displacement detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean luma energy. \textbf{(b)} Analysis of the frame differencing.}
-\label{fig:ROCdisplacement}
+\label{fig:ROC}
 \end{figure}
-\begin{figure}[htb]
-\centering
-\subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus1}}
-\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus_fd}}
-\caption{ROC curves for defocus detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean gradient energy. \textbf{(b)} Analysis of the frame differencing.}
-\label{fig:ROCdisplacement}
-\label{fig:ROCdefocus}
-\end{figure}
+%\begin{figure}[htb]
+%\centering
+%\subfigure[]{\label{fig:buenosAiresDef}\includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus1}}
+%\subfigure[]{\label{fig:buenosAiresDispl} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus_fd}}
+%\caption{ROC curves for defocus detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean gradient energy. \textbf{(b)} Analysis of the frame differencing.}
+%\label{fig:ROCdisplacement}
+%\label{fig:ROCdefocus}
+%\end{figure}
 Experimental results are shown in Figures \ref{fig:ROCdisplacement} and \ref{fig:ROCdefocus}.
 As we could see there is an improvement, in the detection of camera displacements, with our approach which separately analizes the behavior of indicators in adaptive regions.
 On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitoring indicators meant to detect blur/defocus, it is more convenient to consider the whole scene at once.
@@ -443,7 +445,7 @@ On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitorin
 \end{table}
 
 The algorithm uses low computational techniques: the biggest effort is made by computation of the feature $g(t)$, which needs $34$ operations per pixel, due to the Sobel filter used during the convolution.
-
+The computational load could be decreased using Fast Fourier Transform (FFT) \cite{brigham1988fast} and operating in the frequency domain.
 %Numero di operazioni richieste:
 %Calcolo di g(t):
 %\begin{itemize}
