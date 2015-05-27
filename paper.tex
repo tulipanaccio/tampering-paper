@@ -145,7 +145,6 @@ where $f_h$ and $f_h$ are the horizontal and vertical derivative filters, respec
 
 \begin{figure}[tb]
 \centering
-\label{fig:indicatori} 
 \includegraphics[width=1\linewidth]{Immagini/indicatori}
 \caption{Behavior of the average norm of the gradient \textbf{(a)} and its detrending \textbf{(b)} in a sequence with a defocus event.
 The tampering event come at $t = 600$.
@@ -153,6 +152,7 @@ As illustrated in \textbf{(a)}, even in the case in which there aren't tampering
 Detrending is done in order to preserve stationarity in normal situations.
 Considering the detrending \textbf{(b)} persistent changes become instantaneous:
 in particular there is a peak in the instant in which tampering begins.}
+\label{fig:indicatori} 
 \end{figure}
 
 As shown in Figure \ref{fig:indicatori}(a), tampering results in outliers in the sequence of indicators. Detecting these outliers is not straightforward, since indicators heavily fluctuates in normal conditions because of short-term variations in the depicted scene or illumination changes. For outlier-detection purposes~\cite{Chandola2009}, it is more convenient to operate on sequences of independent and identically distributed (i.i.d.) values, where outliers can be detected by density-based methods or simply by confidence regions that is what we considered in our algorithm. Unfortunately, trends or deterministic variations in the indicator sequences are not easy to compensate because of unpredictable evolutions of the scene. 
@@ -362,7 +362,7 @@ e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
 \section{Experiments}\label{sec:experiments}
 The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
 The first one refers to frame sequences taken from webcams recording some parts of cities (as in Figure \ref{fig:sequences}(a)), where we have introduced some synthetically generated tampering events:
-defocus has been simulated using gaussian filters (\ref{fig:sequences}(b)), while displacement has been created with concatenation of similar frame sequences (Figure \ref{fig:sequences}(c)).
+defocus has been simulated using gaussian filters (Figure \ref{fig:sequences}(b)), while displacement has been created with concatenation of similar frame sequences (Figure \ref{fig:sequences}(c)).
 In some cases these sequences contained real tampering events, as in Figure \ref{fig:sequences}(d).\\
 \begin{figure}[t]
 \centering
