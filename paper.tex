@@ -161,7 +161,8 @@ To obtain indicators that in normal conditions can be treated as i.i.d. realizat
 \begin{equation}\label{eq:detrending}
  \partial l_k(t) = l_k(t)-l_k(t-1),  \ \ k = 1, \dots, K\,,
 \end{equation}
-and we similarly define $\partial g(t)$. Detrended indicators are more suitable to be monitored by a confidence interval since, as shown in Figure REFERENCE\_TODO.b). However, a tampering yielding permanent changes in the indicators, as those in Figure REFERENCE\_TODO.a results in a single outlier in the detrended indicator~\eqref{eq:detrending}. 
+and we similarly define $\partial g(t)$. Detrended indicators are more suitable to be monitored by a confidence interval since, as shown in Figure \ref{fig:indicatori}(b). However, a tampering yielding permanent changes in the indicators, as those in Figure \ref{fig:indicatori}(a) results in a single outlier in the detrended indicator~\eqref{eq:detrending}. 
+
 
 We perform outlier detection by defining confidence regions for our indicator in tampering-free frames. In practice, since all these are scalar indicators, it is enough to compute the indicator mean ($\overline{\partial l}_k(t), k = 1,\dots,K$ and $\overline{\partial g}(t)$) and standard deviations ($\sigma_{l_k}, k = 1,\dots,K$ and $\sigma_g$) over the tampering-free frames provided for training, namely $z_t\,, t = 1, \dots, T_o$. Confidence regions are then defined as 
 \begin{equation}\label{eq:confidenceRegions}
@@ -237,6 +238,126 @@ in particular we use a modified version of the classical k-means algorithm \cite
 In this implementation, each feature vector belongs to a cluster if its \textit{weighted Minkowski distance} \cite{de2012minkowski} from the cluster's centroid is minimum with respect to the distance from the other centroids. 
 The distance is weighted considering the standard deviation of each elements of the feature vectors inside each cluster \cite{kottke1994motion}, in order to consider, during the clustering, also the contribute of the fields which have low variance. \ad{Giacomo: prova a vedere se si capisce cosa voglio dire in queste frasi!!!}
 
+
+
+\begin{equation}
+\label{eq:lumaRegions}
+\begin{array}{ccc}
+l^k(t)&  = & \mathcal{L}^k[z_t] = \frac{\sum_{R_k} z_t(x) }{|{R_k}|}\\
+\partial l^k(t) & =& l^k(t)-l^k(t-1) 
+\end{array},
+\end{equation}
+
+
+%\begin{equation}
+%\label{eq:energyLuma}
+%l(t) = \mathcal{L}[z_t] =\frac{\sum_{\mathcal{X}} z_t(x) }{|\mathcal{X}|} ,
+%\end{equation}  
+%
+%
+%\begin{equation}
+%\label{eq:gradientDetr}
+%\frac{\partial g}{\partial t}(t) = g(t) - g(t-1),
+%\end{equation}
+%
+%
+%\begin{equation}
+%\label{eq:lumaDetr}
+%\frac{\partial l}{\partial t}(t) = l(t) - l(t-1).
+%\end{equation}
+
+FRAME DIFFERENCE:
+\begin{equation}
+	\label{eq:frameDiffReg}
+	\varphi^k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
+\end{equation}
+
+\subsection{Outlier Detection}\label{subsec:MonitoringScheme}
+
+
+
+\begin{equation}
+\label{eq:soglieGradiente}
+\begin{array}{lcl}
+\Gamma_{min}^k & = & \hat{\mu}_g^k -\gamma \hat{\sigma}_g^k\\
+\Gamma_{max}^k & = & \hat{\mu}_g^k + \gamma \hat{\sigma}_g^k
+\end{array},
+\end{equation}
+dove $\hat{\mu}_g^k$ indica il valore medio delle osservazioni del training set
+\begin{equation}
+\hat{\mu}_g^k = \frac{\sum_{\tau = 1}^{T_{o}} \frac{\partial g^k}{\partial t}(\tau)}{T_{o}}, \nonumber
+\end{equation}
+$\hat{\sigma}_g^k$ indica la deviazione standard delle osservazioni del training set
+\begin{equation}
+\hat{\sigma}_g^k  = \sqrt{\frac{1}{T_{o}-1}\sum_{\tau=1}^{T_{o}}\left(\frac{\partial g^k}{\partial t}(\tau) - \hat{\mu}_g^k(\tau)\right)^2} \nonumber
+\end{equation}
+e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
+
+\begin{equation}
+\label{eq:soglieLuma}
+\begin{array}{rcl}
+\Gamma_{min}^k & = & \hat{\mu}_l^k -\gamma \hat{\sigma}_l^k\\
+\Gamma_{max}^k & = & \hat{\mu}_l^k + \gamma \hat{\sigma}_l^k
+\end{array},
+\end{equation}
+dove $\hat{\mu}_l^k$ indica il valore medio delle osservazioni del training set
+\begin{equation}
+\hat{\mu}_l^k = \frac{\sum_{\tau = 1}^{T_{o}} \frac{\partial l^k}{\partial t}(\tau)}{T_{o}}, \nonumber
+\end{equation}
+$\hat{\sigma}_l^k$ indica la deviazione standard delle osservazioni del training set
+\begin{equation}
+\hat{\sigma}_l^k  = \sqrt{\frac{1}{T_{o}-1}\sum_{\tau=1}^{T_{o}}\left(\frac{\partial l^k}{\partial t}(\tau) - \hat{\mu}_l^k(\tau)\right)^2} \nonumber
+\end{equation}
+e $\gamma>1$ \`e un parametro moltiplicativo ottenuto sperimentalmente.\\
+
+
+
+
+\subsection{Algorithm Summary}\label{subsec:AlgorithmSummary}
+
+
+
+%\begin{algorithm}[tp]
+%	% \SetAlgoNoLine
+%	\LinesNumbered
+%	\SetAlgoNlRelativeSize{0}
+%	\SetNlSty{small}{}{.}
+%	\textbf{Configuration}:\\
+%	\lnl{DEF-Tr0} Extract regions $\{R_k\}, k=1,\dots,K$  \\
+%	\lnl{DEF-Tr1} \For{$t=1,\dots,T_{o}$}
+%	{	\lnl{DEF-Tr2} Acquire frame $z_t$ \\
+%		\lnl{DEF-Tr2a} \For{$k=1,\dots,K$}{
+%			\lnl{DEF-Tr3a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
+%		}
+%		\lnl{DEF-Tr3} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
+%	}
+%	\lnl{DEF-Tr6a} \For{$k=1,\dots,K$}{
+%		\lnl{DEF-Tr7a} Define thresholds $\Gamma_{min}^k$ and $\Gamma_{max}^k$\\
+%	}
+%	\lnl{DEF-Tr5} Define CDT parameters on $g(t)$ variance\\
+%	\textbf{Operational phase}:\\
+%	\lnl{DEF-Test1} \For{$t=T_{o},\dots,\infty$}{
+%		\lnl{DEF-Test2} Acquire frame $z_t$ \\
+%		\lnl{DEF-Tr3b} Compute $g(t)$, $\frac{\partial g}{\partial t}(t)$ \\
+%		\lnl{DEF-Test2a} $n=0$\\
+%		\lnl{DEF-Test4a} \For{$k=1,\dots,K$}{
+%			\lnl{DEF-Test5a} Compute $g^k(t)$, $\frac{\partial g^k}{\partial t}(t)$ for the region $R_k$\\
+%			\lnl{DEF-Test6a} \If{$\frac{\partial g^k}{\partial t}(t) < \Gamma_{min}^k \vee \frac{\partial g^k}{\partial t}(t) > \Gamma_{max}^k $}{
+%				\lnl{DEF-Test7a} $n=n+1$\\
+%			}
+%		}
+%		\lnl{DEF-Test81} \If{$n \geq K-1$}{
+%			\lnl{DEF-Test91} $z_t$ is a defocused frame\\
+%		}
+%		\lnl{DEF-Test8} \If{CDT detect a change on $g(t)$ variance}{
+%			\lnl{DEF-Test9} $z_t$ is a defocused frame\\
+%		}
+%	}   
+%	\caption{Blur detection algorithm}
+%	\label{alg:DEFOCUS}
+%\end{algorithm}
+
+%\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
 The proposed algorithm has been implemented in MATLAB, and has been tested on two datasets.
@@ -322,7 +443,6 @@ On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitorin
 \end{table}
 
 The algorithm uses low computational techniques: the biggest effort is made by computation of the feature $g(t)$, which needs $34$ operations per pixel, due to the Sobel filter used during the convolution.
-The computational load could decrease using Fast Fourier Transform (FFT) \cite{brigham1988fast} and operating in the frequency domain.
 
 %Numero di operazioni richieste:
 %Calcolo di g(t):
