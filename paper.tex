@@ -101,15 +101,14 @@ Let $z_t$ be the frame acquired at time $t$
 \label{eq:observationModel}
 z_t(x)=\mathcal{D}_t[y_t](x) \quad \forall x \in X
 \end{equation}
-where $\mathcal{D}_t$ denotes an operator that transforms the original image $y_t$ in the acquired frame $z_t$; $X \subset \mathbb{Z}^2$ denotes the regular pixels grid and $x\in \mathbb{Z}^2$ indicates the pixel coordinates. As far as there is no tampering attacks/events,
+where $\mathcal{D}_t$ denotes an operator that transforms the original image $y_t$ in the acquired frame $z_t$; $X \subset \mathbb{Z}^2$ denotes the regular pixels grid and $x\in \mathbb{Z}^2$ indicates the pixel coordinates. As far as there are no tampering attacks/events,
 \begin{equation}
 \label{eq:no_tampering}
 \mathcal{D}_t[y_t](x) = y_t(x) + \eta_t(x) \quad \forall x \in X
 \end{equation}
-where $\eta_t$ is a random variable accounting for image noise, %sources (e.g., thermal, quantization, photon-counting). 
-and all the images $y_t$ might show different content but are acquired from the same viewpoint and the same camera orientation.
+where $\eta_t$ is a random variable accounting for image noise and $y_t$ are acquired from the same viewpoint and camera orientation, even though $y_t$ might show different content because of scene changes.
 
-When, at time $\tau^*$, an external disturbance introduces \emph{blur/defocus}, the image $y_t$ is degraded by an unknown blur operator, and $z_t$ becomes
+When, at time $\tau^*$, an external disturbance introduces \emph{blurring}, the image $y_t$ is degraded by an unknown blur operator, and $z_t$ becomes
 \begin{equation}
 \label{eq:model_defocus}
 \mathcal{D}_t[y_t](x) = \int_{\mathcal{X}}y(s)h_t(x,s)ds\, + \eta_t(x) \quad \forall x \in X, t \geq \tau^*
@@ -130,9 +129,7 @@ The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\
 
 \section{Tampering Detection}\label{sec:propSol}
 
-Algorithm \ref{alg:DISPL} presents the proposed tampering-detection algorithm, which relies on two indicators that are very simple to compute: the average intensity (also referred to as \emph{luma}, and denoted by $l$) and the average norm of the gradient (denoted by $g$). The former is meant to detect camera displacement, the latter camera defocus. As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section \ref{subsec:Segmentation}. 
-
-
+Algorithm \ref{alg:DISPL} presents the proposed tampering-detection algorithm, which relies on two indicators that are very simple to compute: the average intensity (also referred to as \emph{luma}, and denoted by $l$) and the average norm of the gradient (denoted by $g$). The former is meant to detect camera displacement, the latter camera defocus (because blur cases a drop in the high-frequency content). As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section \ref{subsec:Segmentation}. 
 
 For each $z_t$, the luma is separately computed within each of the $K$ regions:
 \begin{equation}\label{eq:lumaRegions}
@@ -153,22 +150,21 @@ where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respec
 \end{figure}
 
 %Tampering changes the sequence of indicators:
-Figure \ref{fig:indicatori}(a) shows how a displacement \gi{TODO} affects the values of $g$. First of all, we observe that displaced frames yield \gi{WHAT} in the indicator sequence. Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here, since these are meant for independent and identically distributed (i.i.d.) random variables. In fact, normal changes in the scene or in the illumination yield indicators that follow an unpredictable (but deterministic) trend, beside some high-frequency fluctuations. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by a temporal derivative (line~\ref{DISPL-Test5})
+Figure~\ref{fig:indicatori}(a) shows how a camera displacement affects the image intensities. First of all, we observe that a displaced frame changes $l(t)$ (in this case introducing a peak) and is even more clearly visible in the sequences $l_k(t)$ of two regions (Figure~\ref{fig:indicatori}(b) and Figure~\ref{fig:indicatori}(c)). Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here. In fact, these methods are meant for independent and identically distributed (i.i.d.) random variables and here, normal changes in the scene or in the illumination, yield indicators that follow an unpredictable (but deterministic) trend. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by a temporal derivative (line~\ref{DISPL-Test5})
 \begin{equation}\label{eq:detrending}
  \partial l_k(t) = l_k(t)-l_k(t-1),  \ \ k = 1, \dots, K\,,
 \end{equation}
 and we similarly define $\partial g(t)$. 
 
-The sequence of detrended indicators can be suitably monitored by defining the following confidence interval: 
+The sequence of detrended indicators are reported in Figure~\ref{fig:indicatori}, and can be suitably monitored by defining the following confidence interval:
 \begin{equation}\label{eq:confidenceRegions}
- [\overline{\partial l}_k(t) - \gamma_l \sigma_{l_k}, \overline{\partial l}_k(t) + \gamma_l \sigma_{l_k}],  k = 1,\dots,K
+ [\overline{\partial l}_k(t) - \gamma_l \sigma_{l_k}, \overline{\partial l}_k(t) + \gamma_l \sigma_{l_k}], \ \  k = 1,\dots,K\,,
 \end{equation}
 where $\overline{\partial l}_k(t)$ denotes the mean and $\sigma_{l_k}$ the standard deviation of $\partial l$ over $R_k$, computed from the tampering-free frames provided for training (i.e. $z_t\,, t = 1, \dots, T_o$) and $\gamma_l >0$ is a tuning parameter. A similar interval is built for $\partial g$ (lines \ref{DISPL-Tr7}). 
 
-During operations, any indicator falling outside its confidence region is considered anomalous (line~\ref{DISPL-Test6}). To raise a camera-displacement alert we require at least $K-1$ indicators $\partial l_k$ to yield an outlier (line~\ref{DISPL-Test8}). This threshold was set to allow a single region not to change, as it typically happens in the sky when the camera is displaced, either horizontally or vertically. In contrast, any outlier in $\partial g$ would yield a blurring\gi{probabilmente e' piu' corretto parlare di blurring invece che defocus.. Adriano, riesci ad allineare? Io menzionerei anche le occlusions assieme al displacement, che dici?} alert (line~\ref{DISPL-Test11}).
+During operations, any indicator falling outside its confidence region is considered anomalous (line~\ref{DISPL-Test6}). To raise a camera-displacement alert we require at least $K-1$ indicators $\partial l_k$ to yield an outlier (line~\ref{DISPL-Test8}). This threshold was set to allow a single region not to change, as it typically happens in the sky when the camera is displaced, either horizontally or vertically. In contrast, any outlier in $\partial g$ would yield a blurring alert (line~\ref{DISPL-Test11}).
 
-
-It is important to remark that tampering yields outliers in the transient of the detrended indicators~\eqref{eq:detrending}: namely, only the first and last tampered frames correspond to an outlier in the detrended indicators, see Figure~\ref{fig:indicatori}(b). Therefore, detrended indicators have to be monitored in a one-shot manner, targeting the detection of the first-tampered frame. On the one hand, this one-shot solution can increase the detection promptness, and this is particularly important at the low frame-rates we consider. On the other hand, it disregards the fact that tampering might persist over several frames. To take this valuable information into account, some form of sequential monitoring should be applied to the indicator sequence as in~\cite{alippi2010detecting}, and possibly combined with the one-shot monitoring.
+It is important to remark that tampering yields outliers in the transient of the detrended indicators~\eqref{eq:detrending}: namely, only the first and last tampered frames correspond to an outlier in the detrended indicators, see the detrended indicators in Figure~\ref{fig:indicatori}. Therefore, detrended indicators have to be monitored in a one-shot manner, targeting the detection of the first tampered-frame. On the one hand, this one-shot solution can provide prompt detections, and this is particularly important at the low frame-rates we consider. On the other hand, it disregards the fact that tampering might persist over several frames. To take this valuable information into account, some form of sequential monitoring should be applied to the indicator sequence as in~\cite{alippi2010detecting}, and possibly combined with the proposed one-shot monitoring.
 
 \begin{algorithm}[t]
 	% \SetAlgoNoLine
@@ -202,21 +198,21 @@ It is important to remark that tampering yields outliers in the transient of the
 \end{algorithm}
 
 \subsection{Scene Segmentation}\label{subsec:Segmentation}
-Scene has to be preliminarily segmented to define regions  that our algorithm takes as input. To this purpose, we need an external training sequence\gi{Dobbiamo dargli un nome} depicting the scene in its normal conditions without any tampering. Segmentation is performed by associating to each pixel $x\in\mathcal{X}$ a feature vector $\textbf{f}(x)\in \mathbb{R}^5$:
+Scene has to be preliminarily segmented to define regions that our algorithm takes as input (see Algorithm \ref{alg:DISPL}). To this purpose, we use part of the training frames before $T_0$ to compute a feature vector $\textbf{f}(x)\in \mathbb{R}^5$ for each pixel $x\in\mathcal{X}$ 
 \begin{equation}
 \label{eq:featureVector}
-\textbf{f}(x)=\left[r(x);c(x);\overline{g}(x);\sigma_{g}(x);\bar{l}(x)\right]\,, \ \forall x \in X
+\textbf{f}(x)=\left[r(x);c(x);\bar{l}(x);\sigma_{l}(x);\overline{g}(x);\sigma_{g}(x)\right]\,, \ \forall x \in X
 \end{equation}
-where $r(x)$ and $c(x)$ represents the row and columns of $x$, $\overline{g}(x)$ and is the gradient norm (smoothed in a neigbhor of $x$) averaged over the training sequence and $\sigma_g$ is the standard deviation of the gradient norm (smoothed in a neigbhor of $x$), computed overtime, and $\bar{l}(x)$ is the average of the gradient over time \gi{ma la deviazione standard della luma nel tempo? cosa faceva?}
+where $r(x)$ and $c(x)$ represent the row and columns of $x$, respectively, 
 
-Segmentation consists in clustering the feature vectors computed over the whole image by means a weighted version of the k-means algorithm~\cite{han2006data}. In particular, since the components of the feature vector might span very different ranges, the distance between a feature vector and the center of a cluster is measured as the \textit{weighted Minkowski distance}~\cite{de2012minkowski}\gi{.. ho tolto questo, non e' uguale allo standard k-means il resto? from the cluster's centroid is minimum with respect to the distance from the other centroids}, which takes into account the standard deviation of each component for each cluster. 
 
-inside each cluster \cite{kottke1994motion}, in order to consider, during the clustering, also the contribute of the fields which have low variance. \ad{Giacomo: prova a vedere se si capisce cosa voglio dire in queste frasi!!!}
+$\overline{g}(x)$ and is the gradient norm (smoothed in a neigbhor of $x$) averaged over the training sequence and $\sigma_g$ is the standard deviation of the gradient norm (smoothed in a neigbhor of $x$), computed overtime, and $\bar{l}(x)$ is the average of the gradient over time \gi{ma la deviazione standard della luma nel tempo? cosa faceva?}
 
-The initial number of clusters is instead chosen by \gi{COME? e poi non ricordo se hai trovato il numero di clusters facendo il k-means con i pesi}
+Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by means of a weighted version of the k-means algorithm~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, the distance between a feature vector and any cluster's centroid, is weighted by the standard deviation of each component for each cluster.
 
-Finally, some canonical morphological image-operations are executed to remove boundaries between different regions, and eventually too small regions. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$.
+The initial number of clusters is instead chosen by \gi{aggiungere reeference e dire che è una procedura iterativa in cui abbiamo inserito il kmeans peasato.}
 
+Finally, morphological image-processing operations are executed to remove boundaries between different regions and eventually regions that are too small. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$.
 
 \subsubsection{Computational Complexity}
 
