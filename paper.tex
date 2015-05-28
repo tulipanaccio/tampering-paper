@@ -208,7 +208,7 @@ where $r(x)$ and $c(x)$ represent the row and columns of $x$, respectively,
 
 $\overline{g}(x)$ and is the gradient norm (smoothed in a neigbhor of $x$) averaged over the training sequence and $\sigma_g$ is the standard deviation of the gradient norm (smoothed in a neigbhor of $x$), computed overtime, and $\bar{l}(x)$ is the average of the gradient over time \gi{ma la deviazione standard della luma nel tempo? cosa faceva?}
 
-Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by means of a weighted version of the k-means algorithm~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, the distance between a feature vector and any cluster's centroid, is weighted by the standard deviation of each component for each cluster.
+Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by a weighted k-means~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, when computing the distance between a feature vector and any cluster's centroid, we scale the distance on each component by its standard deviation.
 
 The initial number of clusters is instead chosen by \gi{aggiungere reeference e dire che è una procedura iterativa in cui abbiamo inserito il kmeans peasato.}
 
