@@ -150,7 +150,7 @@ where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respec
 \end{figure}
 
 %Tampering changes the sequence of indicators:
-Figure~\ref{fig:indicatori}(a) shows how a camera displacement affects the image intensities. First of all, we observe that a displaced frame changes $l(t)$ (in this case introducing a peak) and is even more clearly visible in the sequences $l_k(t)$ of two regions (Figure~\ref{fig:indicatori}(b) and Figure~\ref{fig:indicatori}(c)). Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here. In fact, these methods are meant for independent and identically distributed (i.i.d.) random variables and here, normal changes in the scene or in the illumination, yield indicators that follow an unpredictable (but deterministic) trend. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by a temporal derivative (line~\ref{DISPL-Test5})
+Figure~\ref{fig:indicatori}(a) shows how a camera displacement affects the image intensities. First of all, we observe that a displaced frame changes $l(t)$ (in this case introducing a peak) which is more clearly visible in the sequences $l_k(t)$ of two displayed regions (Figure~\ref{fig:indicatori}(b) and Figure~\ref{fig:indicatori}(c)). Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here. In fact, these methods are meant for independent and identically distributed (i.i.d.) random variables, while here normal changes in the scene or in the illumination, yield indicators that follow an unpredictable (but deterministic) trend. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by a temporal derivative (line~\ref{DISPL-Test5})
 \begin{equation}\label{eq:detrending}
  \partial l_k(t) = l_k(t)-l_k(t-1),  \ \ k = 1, \dots, K\,,
 \end{equation}
@@ -201,31 +201,25 @@ It is important to remark that tampering yields outliers in the transient of the
 Scene has to be preliminarily segmented to define regions that our algorithm takes as input (see Algorithm \ref{alg:DISPL}). To this purpose, we use part of the training frames before $T_0$ to compute a feature vector $\textbf{f}(x)\in \mathbb{R}^5$ for each pixel $x\in\mathcal{X}$ 
 \begin{equation}
 \label{eq:featureVector}
-\textbf{f}(x)=\left[r(x);c(x);\bar{l}(x);\sigma_{l}(x);\overline{g}(x);\sigma_{g}(x)\right]\,, \ \forall x \in X
+\textbf{f}(x)=\left[r(x);c(x);\bar{l}(x);\sigma_{l}(x);\overline{g}(x);\sigma_{g}(x)\right]\,, \ \forall x \in X\,.
 \end{equation}
-where $r(x)$ and $c(x)$ represent the row and columns of $x$, respectively, 
+In \eqref{eq:featureVector}, $r(x)$ and $c(x)$ denotes the row and columns of $x$, respectively, $\bar{l}(x)$ and $\sigma_{l}(x)$ the average and standard deviation of the intensity at $x$ computed over time and $\overline{g}(x)$ and $\sigma_g(x)$ are the average norm of the gradient and its standard deviation, computed overtime. These feature vectors are meant to cluster image regions according to their spatial and temporal behavior during the training frames.
 
+Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by a weighted k-means~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, we compute the distance between a feature vector and a cluster centroid by scaling the Euclidean distance of a weight inversely proportional to the standard deviation over the cluster. \gi{Adriano, controlla bene}
+The number of clusters is defined by the Calinski-Harabasz criterion~\cite{calinski1974dendrite}, which initializes the weighted k-means using different number of clusters, and then chooses the best one according a cost function\gi{Adriano controllare come lo chiama}. 
 
-$\overline{g}(x)$ and is the gradient norm (smoothed in a neigbhor of $x$) averaged over the training sequence and $\sigma_g$ is the standard deviation of the gradient norm (smoothed in a neigbhor of $x$), computed overtime, and $\bar{l}(x)$ is the average of the gradient over time \gi{ma la deviazione standard della luma nel tempo? cosa faceva?}
-
-Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by a weighted k-means~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, when computing the distance between a feature vector and any cluster's centroid, we scale the distance on each component by its standard deviation.
-
-The number of clusters is instead chosen by the Calinski-Harabasz criterion~\cite{calinski1974dendrite}, which considers different k-means instances with different number of clusters, and chooses the best one using a cost function. \ad{which is an iterative procedure where we put weighted k-means}.\gi{aggiungere reeference e dire che è una procedura iterativa in cui abbiamo inserito il kmeans peasato.}
-
-Finally, morphological image-processing operations are executed to remove boundaries between different regions and eventually regions that are too small. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$.
+Finally, morphological image-processing operations are executed to remove boundaries between different regions, and eventually regions that are too small. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$.
 
 \subsubsection{Computational Complexity}
 
-The algorithm uses low computational techniques: the biggest effort is made by computation of the feature $g(t)$, which needs $34$ operations per pixel, due to the Sobel filter used during the convolution.
-The computational load could be decreased using Fast Fourier Transform (FFT) \cite{brigham1988fast} and operating in the frequency domain.
+The most computationally demanding operations in the algorithm consists in computing of the indicators $g(t)$. Assuming that derivatives in~\eqref{eq:normaGradiente} are computed by the Sobel filters, this requires $34$ operations per pixels (and execution times however can be substantially decreased whether hardware implementations of the FFT transform are available). Computing $l(t)$ requires 1 operation per pixel and outlier detection requires two comparisons per frame. Using separate regions has a negligible impact over the overall computational complexity, as well as on the monitoring activity. 
+Segmentation has not been considered because it is executed only for training the algorithm, and can be performed on an external device, connected during configuration.
 
-Segmentation has not been considered because...
-
-FRAME DIFFERENCE:
-\begin{equation}
-	\label{eq:frameDiffReg}
-	\varphi^k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
-\end{equation}
+%FRAME DIFFERENCE:
+%\begin{equation}
+%	\label{eq:frameDiffReg}
+%	\varphi^k(t) = \frac{\sum_{x \in R_k}(z_t(x) - z_{t-1}(x))^2}{|R_k|}, k=1,\dots,K.
+%\end{equation}
 	
 
 %\begin{algorithm}[tp]
@@ -271,7 +265,6 @@ FRAME DIFFERENCE:
 %\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 
 \section{Experiments}\label{sec:experiments}
-\gi{Per ultimo: The proposed algorithm has been implemented in MATLAB, }
 
 Experiments are meant to show the effectiveness of the proposed algorithm on real-world sequences, and in particular on assessing the advantages of using segmentation for detecting camera displacements.
 
@@ -366,6 +359,7 @@ On the other side, as illustrated in Figure \ref{fig:ROCdefocus}, when monitorin
 %Calcolo intervalli di confidenza: ~70 FLOP
 %Confronto tra intervalli di confidenza: 2 confronti
 
+\gi{Per ultimo: The proposed algorithm has been implemented in MATLAB, }
 
 
 \section{Conclusion}\label{sec:Conclusion}
