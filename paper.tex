@@ -210,7 +210,7 @@ $\overline{g}(x)$ and is the gradient norm (smoothed in a neigbhor of $x$) avera
 
 Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by means of a weighted version of the k-means algorithm~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, the distance between a feature vector and any cluster's centroid, is weighted by the standard deviation of each component for each cluster.
 
-The initial number of clusters is instead chosen by \gi{aggiungere reeference e dire che è una procedura iterativa in cui abbiamo inserito il kmeans peasato.}
+The number of clusters is instead chosen by the Calinski-Harabasz criterion~\cite{calinski1974dendrite}, which considers different k-means instances with different number of clusters, and chooses the best one using a cost function. \ad{which is an iterative procedure where we put weighted k-means}.\gi{aggiungere reeference e dire che è una procedura iterativa in cui abbiamo inserito il kmeans peasato.}
 
 Finally, morphological image-processing operations are executed to remove boundaries between different regions and eventually regions that are too small. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$.
 
