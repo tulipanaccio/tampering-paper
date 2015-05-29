@@ -106,15 +106,13 @@ where $\mathcal{D}_t$ denotes an operator that transforms the original image $y_
 \label{eq:no_tampering}
 \mathcal{D}_t[y_t](x) = y_t(x) + \eta_t(x) \quad \forall x \in X
 \end{equation}
-where $\eta_t$ is a random variable accounting for image noise and $y_t$ are acquired from the same viewpoint and camera orientation, even though $y_t$ might show different content because of scene changes.
-
+where $\eta_t$ is a random variable accounting for image noise and $y_t$ are acquired from the same viewpoint and camera orientation, even though $y_t$ might show different content because of scene changes.\\
 When, at time $\tau^*$, an external disturbance introduces \emph{blurring}, the image $y_t$ is degraded by an unknown blur operator, and $z_t$ becomes
 \begin{equation}
 \label{eq:model_defocus}
 \mathcal{D}_t[y_t](x) = \int_{\mathcal{X}}y(s)h_t(x,s)ds\, + \eta_t(x) \quad \forall x \in X, t \geq \tau^*
 \end{equation}
-where $h_t(x,\cdot) > 0$ is the point-spread function at pixel $x \in X$.
-
+where $h_t(x,\cdot) > 0$ is the point-spread function at pixel $x \in X$.\\
 A \emph{camera displacement} at frame $\tau^*$ is instead modeled as 
 \begin{equation}
 \label{eq:model_displacement}
@@ -123,14 +121,12 @@ y_t(x) + \eta(x) & \mbox{per} & t < T^* \\
 w_t(x) + \eta(x) & \mbox{per} & t \geqslant T^*
 \end{array}\right. ,
 \end{equation}
-where $w_t$ relates to a different viewpoint and/or camera orientation than $y_t$. 
-
+where $w_t$ relates to a different viewpoint and/or camera orientation than $y_t$. \\
 The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\}_t$ to detect the time instant $\tau^*$ when tampering like \eqref{eq:model_defocus} or \eqref{eq:model_displacement} occurs. We assume that $T_0$ tampering-free frames and provided for training.
 
 \section{Tampering Detection}\label{sec:propSol}
 
-Algorithm \ref{alg:DISPL} presents the proposed tampering-detection algorithm, which relies on two indicators that are very simple to compute: the average intensity (also referred to as \emph{luma}, and denoted by $l$) and the average norm of the gradient (denoted by $g$). The former is meant to detect camera displacement, the latter blurring over camera lens (because blur cases a drop in the high-frequency content). As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section \ref{subsec:Segmentation}. 
-
+Algorithm \ref{alg:DISPL} presents the proposed tampering-detection algorithm, which relies on two indicators that are very simple to compute: the average intensity (also referred to as \emph{luma}, and denoted by $l$) and the average norm of the gradient (denoted by $g$). The former is meant to detect camera displacement, the latter blurring over camera lens (because blur cases a drop in the high-frequency content). As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section \ref{subsec:Segmentation}. \\
 For each $z_t$, the luma is separately computed within each of the $K$ regions:
 \begin{equation}\label{eq:lumaRegions}
 l_k(t) =\frac{1}{\#R_k} \sum_{x \in R_k} z_t(x), \ \ k = 1, \dots, K\,,
@@ -140,8 +136,7 @@ while the average gradient norm is computed over the whole image
 \label{eq:normaGradiente}
 g(t) = \sum_{x \in X} \left (\sqrt{\left(z_t \circledast f_h\right)^2(x) + \left(z_t \circledast f_v\right)^2(x)}\right),
 \end{equation}
-where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respectively, $\circledast$ denotes the 2d convolution and $\#(\cdot)$ the cardinality of a set.
-
+where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respectively, $\circledast$ denotes the 2d convolution and $\#(\cdot)$ the cardinality of a set.\\
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1\linewidth]{Immagini/indicatori}
@@ -151,22 +146,18 @@ The event comes at frame $157$ and the corresponding value of $l(t)$ is depicted
 \textbf{(b)} and \textbf{(c)} Considering the average value of the luma in a specific region.}
 \label{fig:indicatori} 
 \end{figure}
-
 %Tampering changes the sequence of indicators:
 Figure~\ref{fig:indicatori}(a) shows how a camera displacement affects the image intensities. First of all, we observe that a displaced frame changes $l(t)$ (in this case introducing a peak) which is more clearly visible in the sequences $l_k(t)$ corresponding to the two displayed regions (Figure~\ref{fig:indicatori}(b) and Figure~\ref{fig:indicatori}(c)). Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here. In fact, these methods are meant for independent and identically distributed (i.i.d.) random variables, while here changes in the scene or in the illumination in non-tampered frames, yield indicators that follow an unpredictable trend. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by temporal derivative (line~\ref{DISPL-Test5})
 \begin{equation}\label{eq:detrending}
  \partial l_k(t) = l_k(t)-l_k(t-1),  \ \ k = 1, \dots, K\,,
 \end{equation}
-and we similarly define $\partial g(t)$. 
-
+and we similarly define $\partial g(t)$. \\
 The sequences of detrended indicators are reported in Figure~\ref{fig:indicatori}, and can be suitably monitored by defining the following confidence intervals:
 \begin{equation}\label{eq:confidenceRegions}
  [\overline{\partial l}_k(t) - \gamma_l \sigma_{l_k}, \overline{\partial l}_k(t) + \gamma_l \sigma_{l_k}], \ \  k = 1,\dots,K\,,
 \end{equation}
-where $\overline{\partial l}_k(t)$ denotes the mean and $\sigma_{l_k}$ the standard deviation of $\partial l$ over $R_k$, computed from the tampering-free frames provided for training (i.e. $z_t\,, t = 1, \dots, T_o$) and $\gamma_l >0$ is a tuning parameter. A similar interval is built for $\partial g$ (line~\ref{DISPL-Tr7}). 
-
-During operations, any indicator falling outside its confidence region is considered anomalous (line~\ref{DISPL-Test6}). To raise a camera-displacement alert we require at least $K-1$ indicators $\partial l_k$ to yield an outlier (line~\ref{DISPL-Test8}). This threshold was set to allow a single region not to change, as it typically happens in the sky when the camera is displaced, either horizontally or vertically. In contrast, any outlier in $\partial g$ would yield a blurring alert (line~\ref{DISPL-Test11}).
-
+where $\overline{\partial l}_k(t)$ denotes the mean and $\sigma_{l_k}$ the standard deviation of $\partial l$ over $R_k$, computed from the tampering-free frames provided for training (i.e. $z_t\,, t = 1, \dots, T_o$) and $\gamma_l >0$ is a tuning parameter. A similar interval is built for $\partial g$ (line~\ref{DISPL-Tr7}). \\
+During operations, any indicator falling outside its confidence region is considered anomalous (line~\ref{DISPL-Test6}). To raise a camera-displacement alert we require at least $K-1$ indicators $\partial l_k$ to yield an outlier (line~\ref{DISPL-Test8}). This threshold was set to allow a single region not to change, as it typically happens in the sky when the camera is displaced, either horizontally or vertically. In contrast, any outlier in $\partial g$ would yield a blurring alert (line~\ref{DISPL-Test11}).\\
 It is important to remark that tampering yields outliers in the transient of the detrended indicators~\eqref{eq:detrending}: namely, only the first and last tampered frames correspond to an outlier in the detrended indicators, see the detrended indicators in Figure~\ref{fig:indicatori}. Therefore, detrended indicators have to be monitored in a one-shot manner, targeting the detection of the first tampered-frame. On the one hand, this one-shot solution can provide prompt detections, and this is particularly important at the low frame-rates we consider. On the other hand, one-shot monitoring disregards the fact that tampering might persist over several frames. To take this valuable information into account, some form of sequential monitoring should be applied to the indicator sequence as in~\cite{alippi2010detecting}, and possibly combined with the proposed one-shot monitoring.
 
 \begin{algorithm}[t]
@@ -206,11 +197,10 @@ Scene has to be preliminarily segmented to define regions that our algorithm tak
 \label{eq:featureVector}
 \textbf{f}(x)=\left[r(x);c(x);\bar{l}(x);\sigma_{l}(x);\overline{g}(x);\sigma_{g}(x)\right]\,, \ \forall x \in X\,.
 \end{equation}
-In \eqref{eq:featureVector}, $r(x)$ and $c(x)$ denotes the row and column of $x$, respectively, $\bar{l}(x)$ and $\sigma_{l}(x)$ the average and standard deviation of the intensity at $x$ computed over time, and $\overline{g}(x)$ and $\sigma_g(x)$ are the average norm of the gradient and its standard deviation, computed overtime. These feature vectors are meant to cluster image regions according to their spatial appearance and temporal behavior over training frames.
-
-Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by a weighted k-means~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, we compute the distance between a feature vector and a cluster centroid by scaling the Euclidean distance of a weight inversely proportional to the standard deviation over the cluster. \gi{Adriano, controlla bene}
-The number of clusters is defined by the Calinski-Harabasz criterion~\cite{calinski1974dendrite}, which initializes the weighted k-means using different number of clusters, and then chooses the best one according a cost function\gi{Adriano controllare come lo chiama}. 
-
+In \eqref{eq:featureVector}, $r(x)$ and $c(x)$ denotes the row and column of $x$, respectively, $\bar{l}(x)$ and $\sigma_{l}(x)$ the average and standard deviation of the intensity at $x$ computed over time, and $\overline{g}(x)$ and $\sigma_g(x)$ are the average norm of the gradient and its standard deviation, computed overtime. These feature vectors are meant to cluster image regions according to their spatial appearance and temporal behavior over training frames.\\
+Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by a weighted k-means~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, we compute the distance between a feature vector and a cluster centroid by scaling the Euclidean distance of a weight inversely proportional to the standard deviation over the cluster. %\gi{Adriano, controlla bene}
+%The number of clusters is defined by the Calinski-Harabasz criterion~\cite{calinski1974dendrite}, which initializes the weighted k-means using different number of clusters, and then chooses the best one according a cost function\gi{Adriano controllare come lo chiama}. 
+The number of clusters is defined by initializing the weighted k-means using different number of clusters and then choosing the best solution according to the Calinski-Harabasz criterion~\cite{calinski1974dendrite}.\\
 Finally, morphological image-processing operations are executed to remove boundaries between different regions, and eventually regions that are too small. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$, and two examples are reported in Figure~\ref{fig:indicatori}.
 
 \subsection{Computational Complexity}\label{subsec:coputationalComplexity}
@@ -272,14 +262,19 @@ Experiments are meant to show the effectiveness of the proposed algorithm on rea
 \subsubsection{Considered Methods}
 As far as camera-displacement is concerned, Algorithm \eqref{alg:DISPL} is compared against three variants: 1) monitoring the luma on the whole image (\emph{Luma-Total}), 2) monitoring the total energy of the difference between two adjacent frames (\emph{Frame Difference}), and 3) monitoring the luma on $K$ regions obtained by clustering $[r(x), c(x)]$, which yields a Voronoi partitioning of the scene (\emph{Luma-Voronoi}). Frame difference is considered as a baseline technique for displacement detection, while comparison against \emph{Luma-Voronoi} shows the advantages of setting regions depending of the image content. In the experiments on blurring detection we compare Algorithm \ref{alg:DISPL} against monitoring the gradient separately over image regions, as done for $\partial l_k$.
 \subsubsection{Datasets}
-We acquired two datasets: the first dataset contains \gi{Adriano: how many?} sequences of \gi{Adriano: how many?} frames each that have been recorded from webcam monitoring urban areas (e.g., see Figure \ref{fig:sequences}(a)). The second dataset was recorded using a Raspberry Pi Model B+ \gi{Adriano: refrence} mounting a camera module. In the first dataset tampering was synthetically generated by blurring frames (see, Figure \ref{fig:sequences}(b)) or concatenating frames from different sequences depicting similar environments (see Figure \ref{fig:sequences}(c)). Few sequences of the first dataset contained real tampering events \gi{Adriano: quanti? solo displacement? niente blur considerato qui?} (Figure \ref{fig:indicatori}). In the second dataset, tampering was introduced by moving the device or spraying water on the camera lens. %\gi{una footnote dicendo sequences can be released upon request?}
+We acquired two datasets: the first dataset contains  sequences of  frames taken from webcams monitoring urban areas (e.g., see Figure \ref{fig:sequences}(a)). 
+The second dataset was recorded using a Raspberry Pi Model B+ \cite{raspberry} mounting a camera module. 
+In the first dataset tampering was synthetically generated by blurring frames (see, Figure \ref{fig:sequences}(b)) or concatenating frames from different sequences depicting similar environments (see Figure \ref{fig:sequences}(c)). 
+Few sequences of the first dataset contain real tampering events  (Figure \ref{fig:indicatori}). 
+In the second dataset, tampering was introduced by moving the device or spraying water on the camera lens. 
+At last we have considered $9$ different scenarios, with $10$ displacement events and $10$ blurring events each, for a total of $180$ tampering events.%\gi{una footnote dicendo sequences can be released upon request?}
 \subsubsection{Performance Assessment}
 The typical figure of merit for assessing detection performance in one-shot monitoring methods are the ROC curves: in our case, these can be computed by varying $\gamma_l$ and $\gamma_g$ in a range of values. In particular, each point in the ROC curve depicts a pair of values (1-SPECIFICITY, RECALL) defined as
 \[1-\text{SPECIFICITY}_\gamma = \frac{\text{FP}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma}, \ \text{ and } \ \text{RECALL}_\gamma=\frac{\text{TP}_\gamma}{\text{TP}_\gamma+\text{FN}_\gamma}\]
 where TP, FP, TN, FN represent the number of true positives (tampered frames correctly detected), of false positives (tampering-free frames detected), of true negatives (tampering-free frames not detected) and of false negatives (number of missed tampering frames), for a given value of threshold $\gamma_l$ (or $\gamma_g$).
 \subsubsection{Discussion}
-ROC curves and the AUC in Figure~\ref{fig:ROCdisplacement} caption indicate that camera displacements can be effectively detected. However, the best performance are achieved by Algorithm \ref{alg:DISPL} the (\emph{Frame-Difference} curve has not been reported because it was below these). This result indicate that separately monitoring the luma over image regions is an effective strategy and that the regions have to be carefully designed. Please note that, for the visualization sake, these ROC curves have been reported in a limited range of x and y axis. While the improvement might seem negligible we observe that Algorithm~\ref{alg:DISPL} achieves \gi{Adriano, quanto?} false positive rates (i.e., 1-SPECIFICITY) than..
-
+ROC curves and the AUC in Figure~\ref{fig:ROCdisplacement} caption indicate that camera displacements can be effectively detected. However, the best performance are achieved by Algorithm \ref{alg:DISPL} the (\emph{Frame-Difference} curve has not been reported because it was below these). This result indicate that separately monitoring the luma over image regions is an effective strategy and that the regions have to be carefully designed. Please note that, for the visualization sake, these ROC curves have been reported in a limited range of x and y axis. While the improvement might seem negligible we observe that Algorithm~\ref{alg:DISPL}, for having a recall of $98\%$, achieves $0.3\%$ false positive rates (i.e., 1-SPECIFICITY) than $0.7\%$ of the whole image solution or $1\%$ of the Voronoi regions solution.
+Having a solution which halves the false positives is important in a low-power context, considering the high number of frames to be processed.\\
 In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is more convenient to consider the whole scene at once. This is probably due to the fact that typically, regions $\{R_k\}$ do not include strong edges, which are the most informative to detect blurring.
 
 \begin{figure}[t]
@@ -291,7 +286,7 @@ In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is
 	In particular, AUC of our solution is $0.9994$, while the solution which considers the whole image has an AUC of $0.9989$ and the one which considers Voronoi regions ha san AUC of $0.9985$.
 	\textbf{(b)} ROC curve for blurring detection.
 	In this case considering adaptive regions instead of considering the whole image is not convenient.
-	In particular, AUC of the solution which considers adaptive regions is $0.9895$,  while the solution which considers the whole image has an AUC of $0.9996$}
+	In particular, AUC of the solution which considers adaptive regions is $0.9895$,  while the solution which considers the whole image has an AUC of $0.9996$.}
 \label{fig:ROC}
 \end{figure}
 %\begin{figure}[htb]
@@ -354,8 +349,8 @@ Ongoing work concern the extension of our solution to other types of tampering, 
 %\item Displacement can be perceived by MEMS as well but these device alone are prone to false alarms. Visual inspection is necessary to reduce false alarms
 %\end{itemize}
 
-\section*{Acknowledgments}\label{sec:Acknowledgments}
-Authors would like to thank ST for supporting Adriano Gaibotti.
+%\section*{Acknowledgments}\label{sec:Acknowledgments}
+%Authors would like to thank ST for supporting Adriano Gaibotti.
 
 \bibliographystyle{unsrt}
 \bibliography{bibl_tesi}
@@ -373,7 +368,7 @@ Authors would like to thank ST for supporting Adriano Gaibotti.
 %
 %
 %
-\subsection{Indicators}\label{subsec:Indicators}
+%\subsection{Indicators}\label{subsec:Indicators}
 
 %\begin{equation}
 %\label{eq:gradientRegions}
