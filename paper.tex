@@ -27,7 +27,7 @@
 \begin{document}
 \title{Tampering Detection In Low-Power Smart Cameras}
 
-\author{Adriano Gaibotti\inst{1}\inst{2} \and Claudio Marchisio\inst{1} \and Alexandro Sentinelli\inst{1} \and Giacomo Boracchi\inst{2}}
+\author{Adriano Gaibotti\inst{1,}\inst{2} \and Claudio Marchisio\inst{1} \and Alexandro Sentinelli\inst{1} \and \\ Giacomo Boracchi\inst{2}}
 
 \institute{ 
 	STMicroelectronics, Advanced System Technology, Via Camillo Olivetti 2, 20864, Agrate Brianza (MB), Italy\\
@@ -39,9 +39,9 @@
 \maketitle
 
 \begin{abstract}
-A desirable feature in smart cameras is the ability to autonomously detect any tampering event/attack that would prevent a clear view over the monitored scene. No matter whether tampering is due to atmospheric phenomena (e.g., few rain drops over the camera lens) or to malicious attacks (e.g., the device displacement), these have to be promptly detected to possibly activate countermeasures. Tampering detection becomes particularly challenging in battery-powered cameras, where it is not possible to acquire images at video-like frame-rates, nor use sophisticated image-analysis algorithms. 
+A desirable feature in smart cameras is the ability to autonomously detect any tampering event/attack that would prevent a clear view over the monitored scene. No matter whether tampering is due to atmospheric phenomena (e.g., few rain drops over the camera lens) or to malicious attacks (e.g., the device displacement), these have to be promptly detected to possibly activate countermeasures. Tampering detection becomes particularly challenging in battery-powered cameras, where it is not possible to acquire images at full-speed  frame-rates, nor use sophisticated image-analysis algorithms. 
 
-We here introduce a tampering-detection algorithm specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous indicator is detected as a tampered frame. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image during the algorithm-configuration phase, and which shows to substantially improve the detection of camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one frame every minute, with a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
+We here introduce a tampering-detection algorithm specifically designed for low-power smart cameras: the algorithm leverages very simple indicators that are then monitored by an outlier-detection scheme. Any frame yielding anomalous indicator is detected as a tampered frame. Core of the algorithm is the partitioning of the scene into adaptively defined regions, that are preliminarily defined by segmenting the image during the algorithm-configuration phase, and which shows to improve the detection of camera displacements. Our experiments show that the proposed algorithm can successfully operate on sequences acquired at very low-frame rate, such as one frame every minute, with a very small computational complexity. %and leveraging the image partitioning into regions yields improved performance with respect to monitoring the whole scene
 \keywords{tampering detection, blurring detection, displacement detection}
 \end{abstract}
 
@@ -49,7 +49,7 @@ We here introduce a tampering-detection algorithm specifically designed for low-
 
 \section{Introduction}\label{sec:introduction}
 % What is the problem?
-When cameras operate outdoor and in harsh environments, dust, rain drops or snow flakes might lie on the camera lens resulting in blurry pictures, as shown in Figure \ref{fig:pioggia}, or in partial occlusions of the scene, as in Fig \ref{fig:neve}. Similarly, intentional attacks like displacing the camera, changing its focus, or spraying some opaque or glossy liquid over the lenses, would result in heavily compromised pictures, that would be useless for monitoring purposes. We refer to these events/attacks as tampering. In some cases, tampering is easy to detect, e.g., when the camera integrity is affected and the device goes out-of-order. However, in many other situations, namely when the device is not physically damaged, tampering detection is not straightforward, and sometimes image analysis is the only viable option. 
+When cameras operate outdoor and in harsh environments, dust, rain drops or snow flakes might lie on the camera lens resulting in blurry pictures, as shown in Figure \ref{fig:pioggia}, or in partial occlusions of the scene, as in Figure \ref{fig:neve}. Similarly, intentional attacks like displacing the camera, changing its focus, or spraying some opaque or glossy liquid over the lenses, would result in heavily compromised pictures, that would be useless for monitoring purposes. We refer to these events/attacks as tampering. In some cases, tampering is easy to detect, e.g., when the camera integrity is affected and the device goes out-of-order. However, in many other situations, namely when the device is not physically damaged, tampering detection is not straightforward, and sometimes image analysis is the only viable option. 
 
 \begin{figure}[t!]
 \centering
@@ -60,16 +60,14 @@ When cameras operate outdoor and in harsh environments, dust, rain drops or snow
 \end{figure}
 
 % Why is it interesting and important?
-Tampering detection is an essential feature in surveillance systems~\cite{hampapur2005smart}, where cameras are expected to autonomously detect any tampering, and promptly report alerts. In fact, tampering prevents the correct interpretation of the scenex: even a mild blur might hinder the identification of important details such as licence plates. Surveillance cameras are typically connected to the power supply and operates at normal frame-rates (e.g. around few frames per second): in these conditions, several tampering-detection algorithms have been presented. 
+Tampering detection is an essential feature in surveillance systems~\cite{hampapur2005smart}, where cameras are expected to autonomously detect any tampering, and promptly report alerts. In fact, tampering prevents the correct interpretation of the scene: even a mild blur might hinder the identification of important details such as licence plates. Surveillance cameras are typically connected to the power supply and operate at normal frame-rates (e.g. around few frames per second): in these conditions, several tampering-detection algorithms have been presented. In particular, camera displacement and occlusions are typically detected by estimating the background or computing frame difference, while blurring is instead detected by monitoring the high-frequency components of images, as these are expected to drop. In~\cite{aksay2007camera} and~\cite{saglam2009real} tampering is detected by comparing histograms of background and current frame, and by monitoring the energy in wavelet or Fourier domain. Two background models, estimated over different time intervals, are used in~\cite{saglam2009real}. In~\cite{gil2007automatic}, tampering detection is performed by combining background subtraction together with edge detection and normalized cross-correlation. Background estimates and block matching in~\cite{tsesmelis2013tamper} enable the displacement detection, while the number of SURF~\cite{bay2006surf} keypoints is used to detect blurring. A frame buffer rather than an explicit background is used~\cite{ribnick2006real}. All these solutions, including~\cite{harasse2004automated,kryjak2012fpga} are computationally demanding, and are not viable options for low-power cameras. 
 
-In particular, camera displacement and occlusions are typically detected by estimating the background or computing frame difference, while blurring is instead detected by monitoring the high-frequency components of images, as these are expected to drop. In~\cite{aksay2007camera} and~\cite{saglam2009real} tampering is detected by comparing histograms of background and current frame, and by monitoring the energy in wavelet or Fourier domain. Two background models, estimated over different time intervals, are used in~\cite{saglam2009real}. In~\cite{gil2007automatic}, tampering detection is performed by combining background subtraction together with edge detection and normalized cross-correlation. Background estimates and block matching in~\cite{tsesmelis2013tamper} enable the displacement detection, while the number of SURF~\cite{bay2006surf} keypoints is used to detect blurring. A frame buffer rather than an explicit background is used~\cite{ribnick2006real}. All these solutions, including~\cite{harasse2004automated,kryjak2012fpga} are computationally demanding, and are not viable options for low-power cameras. 
-
-In this work we expressly target low-power and ultra-low-power smart cameras\gi{Claudio, riesci a mettere una reference qua?}, battery-powered devices that are characterized by a constrained computational power and memory availability. Even though these devices are not meant for critical surveillance applications, they are becoming popular in distributed systems for monitoring wide environments due to their low cost and maintenance requirements.  %As an example, consider Wireless Multimedia Sensor Networks (WMSN) \cite{akyildiz2007survey} where smart-cameras can acquire and transmit images at regular time interval or upon requests. 
+In this work we expressly target low-power and ultra-low-power smart cameras, like \emph{SecSoC} (Security System on Chip), an innovative prototype based on a cluster of ReISC (Reduced Energy Instruction Set Computer) cores, designed and producted by STMicroelectronics, operating at clock rates of 82.5 MHz at 1.2V and sub-1MHz at 0.6V. These devices are battery-powered, and characterized by a constrained computational power and memory availability. While low-power cameras are typically not employed in critical surveillance applications, they are becoming popular in distributed systems for monitoring wide environments due to their low cost and maintenance requirements.  %As an example, consider Wireless Multimedia Sensor Networks (WMSN) \cite{akyildiz2007survey} where smart-cameras can acquire and transmit images at regular time interval or upon requests. 
 % These units are not connected to the power supply and have to operate with batteries and possibly rely on energy harvesting~\cite{magno2009adaptive}. 
 %In practice, because of energy constrain, low-power devices have to operate at very low frame-rates: possibly less than one frame every minute.  
 
 % Why is it hard? (E.g., why do naive approaches fail?)
-Tampering detection in low-power smart cameras has not been much investigated in the literature~\cite{alippi2010detecting}, also because it is more challenging than in conventional surveillance cameras~\cite{perrig2004security}. Beside computational aspects -- such as the number of operations per pixels allowed -- the big issue is that low-power smart cameras typically operate at very low-frame rates (e.g., less than one frame per minute), thus the acquired sequence does not evolve smoothly. This prevents the use of learned background models and the analysis of foreground variations. In fact, when dynamic environments are acquired at low frame rates, two consecutive frames might be very different because of changes in the scene and in the light conditions, yielding sequences like those in Figure~\ref{fig:sequences}. Smart cameras have to promptly distinguish between \emph{normal} scene or illumination changes, and changes due to camera tampering to avoid the transmission of corrupted frames. Moreover, false alarms represent a serious problem in low-power smart cameras since they result in energy waste because of useless data processing and network transmissions.
+Tampering detection in low-power smart cameras has not been much investigated in the literature~\cite{alippi2010detecting}, also because it is more challenging than in conventional surveillance cameras~\cite{perrig2004security}. Beside computational aspects -- such as the number of operations per pixels allowed -- the big issue is that low-power smart cameras typically operate at very low-frame rates (e.g., less than one frame per minute), thus the acquired sequence does not evolve smoothly. This prevents the use of learned background models and the analysis of foreground variations. In fact, when dynamic environments are acquired at low frame rates, two consecutive frames might be very different because of changes in the scene and in the light conditions, yielding sequences like those in Figure~\ref{fig:sequences}. Smart cameras have to promptly distinguish between \emph{normal} scene or illumination changes, and changes due to camera tampering to avoid the transmission of corrupted frames. Moreover, false alarms represent a serious problem in low-power smart cameras since they result in energy waste because of useless data processing and unnecessary network transmissions.
 % We here address the problem of detecting tampering events on a camera device that is employed for monitoring purpose. Tampering events can be due to malicious attacks, as for instance a displacement of the camera or spraying some dirty liquid that would prevent the acquisition of (part of) the monitored scene or the interpretation of the content (e.g., the identification of licence plates). 
 
 %What are the key components of my approach and results? Also include any specific limitations.
@@ -77,7 +75,7 @@ We address the detection of camera blurring and displacement, which are presente
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.8\linewidth]{Immagini/sequenze}
+\includegraphics[width=0.9\linewidth]{Immagini/sequenze}
 \caption{Sequences taken from webcams: \textbf{(a)} no tampering events; \textbf{(b)} defocus event on 4-th and 5-th frames, created using gaussian filtering; \textbf{(c)} displacement event on 4-th and 5-th frames, created using concatenation between similar sequences.}
 \label{fig:sequences}
 \end{figure}
@@ -121,12 +119,14 @@ y_t(x) + \eta(x) & \mbox{per} & t < T^* \\
 w_t(x) + \eta(x) & \mbox{per} & t \geqslant T^*
 \end{array}\right. ,
 \end{equation}
-where $w_t$ relates to a different viewpoint and/or camera orientation than $y_t$. \\
-The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\}_t$ to detect the time instant $\tau^*$ when tampering like \eqref{eq:model_defocus} or \eqref{eq:model_displacement} occurs. We assume that $T_0$ tampering-free frames and provided for training.
+where $w_t$ relates to a different viewpoint and/or camera orientation than $y_t$. 
+
+The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\}_t$ to detect the time instant $\tau^*$ when tampering like \eqref{eq:model_defocus} or \eqref{eq:model_displacement} occurs. We assume that $T_0$ tampering-free frames are provided for training.
 
 \section{Tampering Detection}\label{sec:propSol}
 
-Algorithm \ref{alg:DISPL} presents the proposed tampering-detection algorithm, which relies on two indicators that are very simple to compute: the average intensity (also referred to as \emph{luma}, and denoted by $l$) and the average norm of the gradient (denoted by $g$). The former is meant to detect camera displacement, the latter blurring over camera lens (because blur cases a drop in the high-frequency content). As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section \ref{subsec:Segmentation}. \\
+Algorithm~\ref{alg:DISPL} presents the proposed tampering detection, which relies on two simple indicators: the average intensity (also referred to as \emph{luma}, and denoted by $l$) and the average norm of the gradient (denoted by $g$). The former is meant to detect camera displacement, the latter image blurring since it causes a drop in the high-frequency content. As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section~\ref{subsec:Segmentation}. 
+
 For each $z_t$, the luma is separately computed within each of the $K$ regions:
 \begin{equation}\label{eq:lumaRegions}
 l_k(t) =\frac{1}{\#R_k} \sum_{x \in R_k} z_t(x), \ \ k = 1, \dots, K\,,
@@ -136,30 +136,32 @@ while the average gradient norm is computed over the whole image
 \label{eq:normaGradiente}
 g(t) = \sum_{x \in X} \left (\sqrt{\left(z_t \circledast f_h\right)^2(x) + \left(z_t \circledast f_v\right)^2(x)}\right),
 \end{equation}
-where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respectively, $\circledast$ denotes the 2d convolution and $\#(\cdot)$ the cardinality of a set.\\
+where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respectively, $\circledast$ denotes the 2d convolution and $\#(\cdot)$ the cardinality of a set.
+
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1\linewidth]{Immagini/indicatori}
-\caption{Example of displacement. On the left side of the image is reported the behavior of the average value of the luma, while on the right side there is its detrending.
-The event comes at frame $157$ and the corresponding value of $l(t)$ is depicted with a red star. 
-\textbf{(a)} Considering the average value of the luma in the whole scene. 
-\textbf{(b)} and \textbf{(c)} Considering the average value of the luma in a specific region.}
+\caption{Example of camera displacement. Left plots report the luma values, while right plots depict the detrended luma: we show both indicators computed over the full image (\textbf{a}) and on two reported regions (\textbf{b} and \textbf{c}). Red stars indicate a single displaced frame, which occurs at $t =157$. Displacement yields a peak in $l$ and two outliers in the sequence of detrended indicators $\partial l$, which can be clearly detected. }
 \label{fig:indicatori} 
 \end{figure}
 %Tampering changes the sequence of indicators:
-Figure~\ref{fig:indicatori}(a) shows how a camera displacement affects the image intensities. First of all, we observe that a displaced frame changes $l(t)$ (in this case introducing a peak) which is more clearly visible in the sequences $l_k(t)$ corresponding to the two displayed regions (Figure~\ref{fig:indicatori}(b) and Figure~\ref{fig:indicatori}(c)). Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here. In fact, these methods are meant for independent and identically distributed (i.i.d.) random variables, while here changes in the scene or in the illumination in non-tampered frames, yield indicators that follow an unpredictable trend. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by temporal derivative (line~\ref{DISPL-Test5})
+
+Figure~\ref{fig:indicatori}(a) shows how a camera displacement affects the image intensities. First of all, we observe that a displaced frame changes $l(t)$ (in this case introducing a peak) which is also visible in the sequences $l_k(t)$ corresponding to the two displayed regions (Figure~\ref{fig:indicatori}(b) and Figure~\ref{fig:indicatori}(c)). Second, we observe that outlier-detection methods~\cite{Chandola2009} based on density estimates or on confidence intervals --that are very efficient to run-- cannot be straightforwardly applied here. In fact, these methods are meant for independent and identically distributed (i.i.d.) random variables, while here indicators follow an unpredictable trend because of changes in the scene or in the illumination. Therefore, we perform a detrending~\cite{Gustafsson2000} of the indicator sequence by a temporal derivative (line~\ref{DISPL-Test5})
 \begin{equation}\label{eq:detrending}
  \partial l_k(t) = l_k(t)-l_k(t-1),  \ \ k = 1, \dots, K\,,
 \end{equation}
-and we similarly define $\partial g(t)$. \\
+and we similarly define $\partial g(t)$. 
+
 The sequences of detrended indicators are reported in Figure~\ref{fig:indicatori}, and can be suitably monitored by defining the following confidence intervals:
 \begin{equation}\label{eq:confidenceRegions}
  [\overline{\partial l}_k(t) - \gamma_l \sigma_{l_k}, \overline{\partial l}_k(t) + \gamma_l \sigma_{l_k}], \ \  k = 1,\dots,K\,,
 \end{equation}
-where $\overline{\partial l}_k(t)$ denotes the mean and $\sigma_{l_k}$ the standard deviation of $\partial l$ over $R_k$, computed from the tampering-free frames provided for training (i.e. $z_t\,, t = 1, \dots, T_o$) and $\gamma_l >0$ is a tuning parameter. A similar interval is built for $\partial g$ (line~\ref{DISPL-Tr7}). \\
-During operations, any indicator falling outside its confidence region is considered anomalous (line~\ref{DISPL-Test6}). To raise a camera-displacement alert we require at least $K-1$ indicators $\partial l_k$ to yield an outlier (line~\ref{DISPL-Test8}). This threshold was set to allow a single region not to change, as it typically happens in the sky when the camera is displaced, either horizontally or vertically. In contrast, any outlier in $\partial g$ would yield a blurring alert (line~\ref{DISPL-Test11}).\\
-It is important to remark that tampering yields outliers in the transient of the detrended indicators~\eqref{eq:detrending}: namely, only the first and last tampered frames correspond to an outlier in the detrended indicators, see the detrended indicators in Figure~\ref{fig:indicatori}. Therefore, detrended indicators have to be monitored in a one-shot manner, targeting the detection of the first tampered-frame. On the one hand, this one-shot solution can provide prompt detections, and this is particularly important at the low frame-rates we consider. On the other hand, one-shot monitoring disregards the fact that tampering might persist over several frames. To take this valuable information into account, some form of sequential monitoring should be applied to the indicator sequence as in~\cite{alippi2010detecting}, and possibly combined with the proposed one-shot monitoring.
+where $\overline{\partial l}_k(t)$ denotes the mean and $\sigma_{l_k}$ the standard deviation of $\partial l$ over $R_k$ (lines \ref{DISPL-Tr1} and \ref{DISPL-Tr7}), computed from the tampering-free frames provided for training (i.e. $z_t\,, t = 1, \dots, T_o$) and $\gamma_l >0$ is a tuning parameter. A similar interval is built for $\partial g$ (line~\ref{DISPL-Tr7}). 
 
+During operations, any indicator falling outside its confidence region is considered anomalous (line~\ref{DISPL-Test6}). To raise a camera-displacement alert we require at least $K-1$ indicators $\partial l_k$ to yield an outlier (line~\ref{DISPL-Test8}). This threshold was set to allow a single region not to change, as it typically happens in the sky when the camera is displaced, either horizontally or vertically. In contrast, any outlier in $\partial g$ would yield a blurring alert (line~\ref{DISPL-Test11}).
+
+It is important to remark that tampering yields outliers in the transient of the detrended indicators~\eqref{eq:detrending}: namely, a single tampered frame yield two outliers (as shown in Figure~\ref{fig:indicatori}) and only the first and the last of few consecutive tampered frames yield an outlier in the detrended indicators. This is the reason why detrended indicators are monitored in a one-shot manner, targeting the detection of the first tampered-frame. On the one hand, this one-shot solution can provide prompt detections, and this is particularly important at the low frame-rates we consider. On the other hand, one-shot monitoring disregards the fact that tampering might persist over several frames. To take this valuable information into account, some form of sequential monitoring should be applied to the indicator sequence as in~\cite{alippi2010detecting}, and possibly combined with the proposed one-shot monitoring.
+%
 \begin{algorithm}[t]
 	% \SetAlgoNoLine
 	\LinesNumbered
@@ -190,23 +192,25 @@ It is important to remark that tampering yields outliers in the transient of the
 	\caption{The Proposed Tampering-Detection Algorithm}
 	\label{alg:DISPL}
 \end{algorithm}
-
+%
 \subsection{Scene Segmentation}\label{subsec:Segmentation}
 Scene has to be preliminarily segmented to define regions that our algorithm takes as input (see Algorithm \ref{alg:DISPL}). To this purpose, we use part of the training frames before $T_0$ to compute a feature vector $\textbf{f}(x)\in \mathbb{R}^5$ for each pixel $x\in\mathcal{X}$ 
 \begin{equation}
 \label{eq:featureVector}
 \textbf{f}(x)=\left[r(x);c(x);\bar{l}(x);\sigma_{l}(x);\overline{g}(x);\sigma_{g}(x)\right]\,, \ \forall x \in X\,.
 \end{equation}
-In \eqref{eq:featureVector}, $r(x)$ and $c(x)$ denotes the row and column of $x$, respectively, $\bar{l}(x)$ and $\sigma_{l}(x)$ the average and standard deviation of the intensity at $x$ computed over time, and $\overline{g}(x)$ and $\sigma_g(x)$ are the average norm of the gradient and its standard deviation, computed overtime. These feature vectors are meant to cluster image regions according to their spatial appearance and temporal behavior over training frames.\\
+In \eqref{eq:featureVector}, $r(x)$ and $c(x)$ denotes the row and column of $x$, respectively, $\bar{l}(x)$ and $\sigma_{l}(x)$ the mean and standard deviation of the intensity at $x$, computed over time, and $\overline{g}(x)$ and $\sigma_g(x)$ the mean of gradient norm and its standard deviation, computed overtime. These feature vectors are meant to cluster pixels in regions having similar spatial appearance and temporal behavior over training frames.
+
 Segmentation consists in clustering the feature vectors~\eqref{eq:featureVector} over the whole image by a weighted k-means~\cite{kottke1994motion}. In particular, since the components of the feature vector span very different ranges, we compute the distance between a feature vector and a cluster centroid by scaling the Euclidean distance of a weight inversely proportional to the standard deviation over the cluster. %\gi{Adriano, controlla bene}
 %The number of clusters is defined by the Calinski-Harabasz criterion~\cite{calinski1974dendrite}, which initializes the weighted k-means using different number of clusters, and then chooses the best one according a cost function\gi{Adriano controllare come lo chiama}. 
-The number of clusters is defined by initializing the weighted k-means using different number of clusters and then choosing the best solution according to the Calinski-Harabasz criterion~\cite{calinski1974dendrite}.\\
+The number of clusters is defined by initializing the weighted k-means using different number of clusters and then choosing the best solution according to the Calinski-Harabasz criterion~\cite{calinski1974dendrite}.
+
 Finally, morphological image-processing operations are executed to remove boundaries between different regions, and eventually regions that are too small. This defines the regions $\{R_k\,, \ k=1,\dots,K\}$, and two examples are reported in Figure~\ref{fig:indicatori}.
 
 \subsection{Computational Complexity}\label{subsec:coputationalComplexity}
 
-The most computationally demanding operations in the algorithm consists in computing of the indicators $g(t)$. Assuming that derivatives in~\eqref{eq:normaGradiente} are computed by the Sobel filters, this requires $34$ operations per pixels\footnote{Execution times can be however  decreased whether hardware implementations of the FFT transform are available}. Computing $l(t)$ requires 1 operation per pixel and the outlier detection over the indicators require two comparisons per frame. Thus, monitoring regions has a negligible impact over the overall computational complexity. 
-Segmentation has not been here considered because it is executed only when training the algorithm, and can be performed on an external device connected to the smart camera during configuration.
+The most computationally demanding operations of Algorithm \ref{alg:DISPL} consists in computing of the indicators $g(t)$. Assuming that derivatives in~\eqref{eq:normaGradiente} are computed by the Sobel filters, this requires $34$ operations per pixels\footnote{Execution times can be however  decreased whether hardware implementations of the FFT transform are available}. Computing $l(t)$ requires 1 operation per pixel and the outlier detection over the indicators require two comparisons per frame. Thus, monitoring regions has a negligible impact over the overall computational complexity. 
+Segmentation has not been here considered because it is executed only during the initial training phase, and can be performed on an external device connected to the smart camera during configuration.
 
 %FRAME DIFFERENCE:
 %\begin{equation}
@@ -256,11 +260,14 @@ Segmentation has not been here considered because it is executed only when train
 %\end{algorithm}
 
 %\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
-
+\vspace{-0.2cm}
 \section{Experiments}\label{sec:experiments}
 Experiments are meant to show the effectiveness of the proposed algorithm on real-world sequences, and to specifically assess the advantage of using segmentation for detecting camera displacements. 
+\vspace{-0.3cm}
 \subsubsection{Considered Methods}
-As far as camera-displacement is concerned, Algorithm \eqref{alg:DISPL} is compared against three variants: 1) monitoring the luma on the whole image (\emph{Luma-Total}), 2) monitoring the total energy of the difference between two adjacent frames (\emph{Frame Difference}), and 3) monitoring the luma on $K$ regions obtained by clustering $[r(x), c(x)]$, which yields a Voronoi partitioning of the scene (\emph{Luma-Voronoi}). Frame difference is considered as a baseline technique for displacement detection, while comparison against \emph{Luma-Voronoi} shows the advantages of setting regions depending of the image content. In the experiments on blurring detection we compare Algorithm \ref{alg:DISPL} against monitoring the gradient separately over image regions, as done for $\partial l_k$.
+As far as camera-displacement is concerned, Algorithm \eqref{alg:DISPL} is compared against three variants: 1) monitoring the luma on the whole image (\emph{Luma-Total}), 2) monitoring the total energy of the difference between two adjacent frames (\emph{Frame Difference}), and 3) monitoring the luma on $K$ regions obtained by clustering $[r(x), c(x)]$, which yields a Voronoi partitioning of the scene (\emph{Luma-Voronoi}). Frame difference is considered as a baseline technique for displacement detection, while comparison against \emph{Luma-Voronoi} shows the advantages of setting regions depending of the image content. \\
+In the experiments on blurring detection, we compare Algorithm \ref{alg:DISPL} (where $\partial g$ is monitored on the whole image), against monitoring $\partial g$ separately in image regions, as done for $\partial l_k$.
+\vspace{-0.3cm}
 \subsubsection{Datasets}
 We acquired two datasets: the first dataset contains  sequences of  frames taken from webcams monitoring urban areas (e.g., see Figure \ref{fig:sequences}(a)). 
 The second dataset was recorded using a Raspberry Pi Model B+ \cite{raspberry} mounting a camera module. 
@@ -268,25 +275,26 @@ In the first dataset tampering was synthetically generated by blurring frames (s
 Few sequences of the first dataset contain real tampering events  (Figure \ref{fig:indicatori}). 
 In the second dataset, tampering was introduced by moving the device or spraying water on the camera lens. 
 At last we have considered $9$ different scenarios, with $10$ displacement events and $10$ blurring events each, for a total of $180$ tampering events.%\gi{una footnote dicendo sequences can be released upon request?}
+\vspace{-0.3cm}
 \subsubsection{Performance Assessment}
-The typical figure of merit for assessing detection performance in one-shot monitoring methods are the ROC curves: in our case, these can be computed by varying $\gamma_l$ and $\gamma_g$ in a range of values. In particular, each point in the ROC curve depicts a pair of values (1-SPECIFICITY, RECALL) defined as
+The typical figure of merit for assessing detection performance in one-shot monitoring methods are the Receiver-Operating Characteristic (ROC) curves: in our case, these can be computed by varying $\gamma_l$ and $\gamma_g$ in a range of values. In particular, each point in the ROC curve depicts a pair of values (1-SPECIFICITY, RECALL) defined as
 \[1-\text{SPECIFICITY}_\gamma = \frac{\text{FP}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma}, \ \text{ and } \ \text{RECALL}_\gamma=\frac{\text{TP}_\gamma}{\text{TP}_\gamma+\text{FN}_\gamma}\]
-where TP, FP, TN, FN represent the number of true positives (tampered frames correctly detected), of false positives (tampering-free frames detected), of true negatives (tampering-free frames not detected) and of false negatives (number of missed tampering frames), for a given value of threshold $\gamma_l$ (or $\gamma_g$).
+where TP, FP, TN, FN represent the number of true positives (tampered frames correctly detected), of false positives (tampering-free frames detected), of true negatives (tampering-free frames not detected) and of false negatives (missed tampered frames), respectively, for a given value of $\gamma_l$ (or $\gamma_g$).
+\vspace{-0.3cm}
 \subsubsection{Discussion}
-ROC curves and the AUC in Figure~\ref{fig:ROCdisplacement} caption indicate that camera displacements can be effectively detected. However, the best performance are achieved by Algorithm \ref{alg:DISPL} the (\emph{Frame-Difference} curve has not been reported because it was below these). This result indicate that separately monitoring the luma over image regions is an effective strategy and that the regions have to be carefully designed. Please note that, for the visualization sake, these ROC curves have been reported in a limited range of x and y axis. While the improvement might seem negligible we observe that Algorithm~\ref{alg:DISPL}, for having a recall of $98\%$, achieves $0.3\%$ false positive rates (i.e., 1-SPECIFICITY) than $0.7\%$ of the whole image solution or $1\%$ of the Voronoi regions solution.
-Having a solution which halves the false positives is important in a low-power context, considering the high number of frames to be processed.\\
-In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is more convenient to consider the whole scene at once. This is probably due to the fact that typically, regions $\{R_k\}$ do not include strong edges, which are the most informative to detect blurring.
+ROC curves and the Area Under the Curve (AUC) reported in Figure~\ref{fig:ROCdisplacement} and its caption indicate that camera displacements can be effectively detected by all the considered methods, and that Algorithm~\ref{alg:DISPL} achieves the best performance (the \emph{Frame-Difference} curve has not been reported because it was quite below the others). This result suggests that separately monitoring the luma over image regions is an effective strategy and that the regions have to be suitably estimated. For the visualization sake, these ROC curves have been reported in a limited range of both axis, and in particular we focus on low values of 1-SPECIFICITY, thus of false alarms. We observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $0.3\%$ of false alarms, which is half of the whole image solution ($0.7\%$) and less than one third of the Voronoi solution ($1\%$). Having few false alarms is important in a low-power context, considering the high number of frames that have to be processed. Most importantly, false alerts are halved basically at no computational overhead.
+
+In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is more convenient to consider the whole scene at once, as typically the regions $\{R_k\}$ do not include the most prominent edge of the scene, which are indeed the most informative part to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image.
 
 \begin{figure}[t]
 \centering
 \subfigure[]{\label{fig:ROCdisplacement}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement}}
 \subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus}}
 \caption{\textbf{(a)} ROC curve for displacement detection.
-	There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
-	In particular, AUC of our solution is $0.9994$, while the solution which considers the whole image has an AUC of $0.9989$ and the one which considers Voronoi regions ha san AUC of $0.9985$.
+	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
+	The AUC corresponding to Algorithm~\ref{alg:DISPL} (Luma-Region) is $99.94\%$, the AUC of Luma-Total is $99.89\%$ the AUC of Luma-Voronoi is $99.85\%$, and the AUC of Frame-Difference is $99.44\%$ (axis have been zoomed for the visualization sake). Large AUC values indicate that these displacements can be successfully detected and that Algorithm~\ref{alg:DISPL} is the most effective one.
 	\textbf{(b)} ROC curve for blurring detection.
-	In this case considering adaptive regions instead of considering the whole image is not convenient.
-	In particular, AUC of the solution which considers adaptive regions is $0.9895$,  while the solution which considers the whole image has an AUC of $0.9996$.}
+	In this case, the Gradient-Total (AUC $99.96\%$) outperforms the Gradient-Regions (AUC $98.95\%$) because this latter do not include the most prominent edges in images, which are the most important information to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image.}
 \label{fig:ROC}
 \end{figure}
 %\begin{figure}[htb]
@@ -329,11 +337,12 @@ In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is
 %Ogni 20 frame
 %Calcolo intervalli di confidenza: ~70 FLOP
 %Confronto tra intervalli di confidenza: 2 confronti
+\vspace{-0.3cm}
+\section{Conclusions}\label{sec:Conclusion}
+\vspace{-0.1cm}
+We presented a tampering detection algorithm that leverages a preliminary image partitioning to improve the detection of camera displacements, and that at the same time can detect blurring. The algorithm has low-computational complexity and is suited for low-power cameras operating at low frame rates.
 
-\section{Conclusion}\label{sec:Conclusion}
-We presented a tampering detection algorithm that leverages a preliminary image partition to improve the detection of camera displacements, while at the same time can detect blurring. This algorithm has low-computational complexity and is suited for low-power cameras operating at low frame rates.
-
-Ongoing work concern the extension of our solution to other types of tampering, as occlusions or imaging sensor degradations, as well as the integration of this one-shot technique with sequential monitoring scheme such as~\cite{alippi2010detecting}, to leverage the fact that tampering might last more than one frame in the detection. Moreover, we will investigate different segmentation strategy and test our algorithm on a larger dataset.
+Ongoing work concern the extension of our solution to other types of tampering, such as occlusions or imaging sensor degradations, as well as the integration of this one-shot technique with sequential monitoring scheme such as~\cite{alippi2010detecting}, to leverage the fact that tampering might last more than one frame in the detection. Moreover, we will investigate different segmentation strategy and test our algorithm on a larger dataset.
 
 %Ongoing work regards the.
 %Furthermore, we are investigating strategies to improve the detection performance and reduce the number of \textit{FP}s by combination of our solution with other techniques:
