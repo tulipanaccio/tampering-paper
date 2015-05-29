@@ -287,7 +287,12 @@ In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is
 \centering
 \subfigure[]{\label{fig:ROCdisplacement}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement}}
 \subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus}}
-\caption{ROC curves for displacement detection, considering three alternative approaches. \textbf{(a)} Analysis of the mean luma energy. \textbf{(b)} Analysis of the frame differencing.}
+\caption{\textbf{(a)} ROC curve for displacement detection.
+	There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
+	In particular, AUC of our solution is $0.9994$, while the solution which considers the whole image has an AUC of $0.9989$ and the one which considers Voronoi regions ha san AUC of $0.9985$.
+	\textbf{(b)} ROC curve for blurring detection.
+	In this case considering adaptive regions instead of considering the whole image is not convenient.
+	In particular, AUC of the solution which considers adaptive regions is $0.9895$,  while the solution which considers the whole image has an AUC of $0.9996$}
 \label{fig:ROC}
 \end{figure}
 %\begin{figure}[htb]
