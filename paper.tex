@@ -74,7 +74,7 @@ Tampering detection in low-power cameras (eventually organized in wireless senso
 We address the detection of camera blurring and displacement, which are presented in Section \ref{sec:probForm}. The proposed algorithm (Section~\ref{sec:propSol}) relies on indicators that can be easily computed in low-power smart cameras, such as the average image intensity or frame difference (to detect camera displacement), and the average gradient norm (to detect blurring), and detects tampering as frames yielding outliers. In particular, we show that separately monitoring indicators over different regions of the image can substantially improve the displacement-detection performance. Remarkably, image regions can be preliminarily defined during an initial configuration phase (Section \ref{subsec:Segmentation}), thus the algorithm operates at a negligible computational overhead w.r.t. monitoring the whole image (Section \ref{subsec:coputationalComplexity}). Thus, our solution represents a prompt trigger that can be possibly combined with other sequential monitoring techniques. Experiments in Section \ref{sec:experiments} show that leveraging image regions can substantially improve the displacement-detection performance. % Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.9\linewidth]{Immagini/sequenze}
+\includegraphics[width=1\linewidth]{Immagini/sequenze}
 \caption{Sequences taken from webcams: \textbf{(a)} no tampering events; \textbf{(b)} defocus event on 3-rd frame, created using gaussian filtering; \textbf{(c)} displacement event on 3-rd frame, created moving the crop of the original image from the center.}
 \label{fig:sequences}
 \end{figure}
@@ -287,8 +287,7 @@ In contrast, Figure~\ref{fig:ROCdefocus} confirms that when monitoring $g$ it is
 
 \begin{figure}[t]
 \centering
-\subfigure[]{\label{fig:ROCdisplacement}\includegraphics[width=0.45\linewidth]{Immagini/ROCdisplacement}}
-\subfigure[]{\label{fig:ROCdefocus} \includegraphics[width=0.45\linewidth]{Immagini/ROCdefocus}}
+\includegraphics[width=1\linewidth]{Immagini/curve}
 \caption{\textbf{(a)} ROC curve for displacement detection.
 	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
 	The AUC corresponding to Algorithm~\ref{alg:DISPL} (Luma-Region) is $99.94\%$, the AUC of Luma-Total is $99.89\%$ the AUC of Luma-Voronoi is $99.85\%$, and the AUC of Frame-Difference is $99.44\%$ (axis have been zoomed for the visualization sake). Large AUC values indicate that these displacements can be successfully detected and that Algorithm~\ref{alg:DISPL} is the most effective one.
