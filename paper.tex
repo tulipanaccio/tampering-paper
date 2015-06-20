@@ -222,19 +222,15 @@ The most computationally demanding operations of Algorithm \ref{alg:DISPL} consi
 %\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 \vspace{-0.2cm}
 \section{Experiments}\label{sec:experiments}
-Experiments are meant to show the effectiveness of the proposed algorithm on real-world sequences, and to specifically assess the advantage of using segmentation for detecting camera displacements. 
-\vspace{-0.3cm}
-\subsubsection{Considered Methods}
-As far as camera-displacement is concerned, Algorithm \eqref{alg:DISPL} is compared against three variants: 1) monitoring the luma on the whole image (\emph{Luma-Total}), 2) monitoring the total energy of the difference between two adjacent frames (\emph{Frame Difference}), and 3) monitoring the luma on $K$ regions obtained by clustering $[r(x), c(x)]$, which yields a Voronoi partitioning of the scene (\emph{Luma-Voronoi}). Frame difference is considered as a baseline technique for displacement detection, while comparison against \emph{Luma-Voronoi} shows the advantages of setting regions depending of the image content. \\
-In the experiments on blurring detection, we compare Algorithm \ref{alg:DISPL} (where $\partial g$ is monitored on the whole image), against monitoring $\partial g$ separately in image regions, as done for $\partial l_k$.
-\vspace{-0.3cm}
+Experiments are meant to assess the advantages of using a segmentation in a tampering-detection framework like Algorithm~\eqref{alg:DISPL}. In particular, to assess the importance of partitioning the scene we compare Algorithm~\eqref{alg:DISPL} against a solution monitoring the indicators on the whole image (\emph{Total} in Figure~\ref{fig:ROC}). To show that regions have to be defined depending on the image content, we consider also Algorithm~\eqref{alg:DISPL} when the $K$ regions are obtained by clustering $[r(x), c(x)]$, which yields a Voronoi partitioning of the scene (\emph{Voronoi} in Figure~\ref{fig:ROC}). For both regions defined as in Section~\ref{subsec:Segmentation} and Voronoi regions, we test the two extreme cases where $\Gamma_l = 1$ and $\Gamma_l = K-1$ ($\Gamma_d = 1$ and $\Gamma_d = K-1$).
+
 \subsubsection{Datasets}
-The considered dataset contains  sequences of  frames taken from webcams monitoring urban areas (e.g., see Figure \ref{fig:sequences}(a)), in which we've taken the central crop of each image (about $3/4$ of the original image). 
+We recorded $8$ sequences from webcams monitoring different urban areas and we synthetically introduced $5\%$ of tampered frames in each. In each sequence we have cropped the central region, removing 50 rows from the top and bottom, and 50 columns from the left and right of the image. Blurring was obtained by convolution against a Gaussian kernels (as in Figure \ref{fig:sequences}(a)), while displacements were simulated by moving the central cropping regions of a random shift between 20 and 50 pixels in each direction (see Figure \ref{fig:sequences}(b)).  Overall, the dataset contains $24410$ frames, in which we've inserted $5\%$ of displacement events ($1224$ frames) and $5\%$ of blurring events ($1224$ frames).\footnote{Sequences can be released upon request.}
+\gi{image sizes? blur kernel? quanti pixel il displacemnet?}
 %The second dataset was recorded using a Raspberry Pi Model B+ \cite{raspberry} mounting a camera module. 
-In order to have a wide and sound dataset, the tampering events have been made synthetically, blurring the frames by gaussian kernels (see, Figure \ref{fig:sequences}(b)) or moving the crop of the frames in order to simulate displacements (see Figure \ref{fig:sequences}(c)). 
+
 %Few sequences of the first dataset contain real tampering events  (Figure \ref{fig:indicatori}). 
 %In the second dataset, tampering was introduced by moving the device or spraying water on the camera lens. 
-At last we have considered $8$ different scenarios, for a total of $24410$ frames considered, in which we've inserted $5\%$ of displacement events ($1224$ frames) and $5\%$ of blurring events ($1224$ frames).\footnote{Sequences can be released upon request}
 \vspace{-0.3cm}
 \subsubsection{Performance Assessment}
 The typical figure of merit for assessing detection performance in one-shot monitoring methods are the Receiver-Operating Characteristic (ROC) curves: in our case, these can be computed by varying $\gamma_l$, $\gamma_d$ and $\gamma_g$ in a range of values. In particular, each point in the ROC curve depicts a pair of values (1-SPECIFICITY, RECALL) defined as
