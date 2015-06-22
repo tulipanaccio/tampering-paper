@@ -146,7 +146,10 @@ where $f_h$ and $f_v$ are the horizontal and vertical derivative filters, respec
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1\linewidth]{Immagini/indicatori}
-\caption{Example of camera displacement. Left plots report the luma values, while right plots depict the detrended luma: we show both indicators computed over the full image (\textbf{a}) and on two reported regions (\textbf{b} and \textbf{c}). Red stars indicate a single displaced frame, which occurs at $t =157$. Displacement yields a peak in $l$ and two outliers in the sequence of detrended indicators $\partial l$, which can be clearly detected. }
+\caption{Example of camera displacement. 
+Left plots report the luma values, while right plots depict the detrended luma: 
+we show both indicators computed over the full image (\textbf{a}) and on two reported regions (\textbf{b} and \textbf{c}). Red dots indicate a single displaced frame. Values in the highlighted areas refer to the frames depicted on top of the fugure. 
+Displacement yields a peak in $l$ and two outliers in the sequence of detrended indicators $\partial l$, which can be clearly detected. }
 \label{fig:indicatori} 
 \end{figure}
 %Tampering changes the sequence of indicators:
@@ -224,33 +227,39 @@ The most computationally demanding operations of Algorithm \ref{alg:DISPL} consi
 \section{Experiments}\label{sec:experiments}
 Experiments are meant to assess the advantages of separately monitoring regions in a tampering-detection framework like Algorithm~\ref{alg:DISPL}. To this purpose, we show that Algorithm~\ref{alg:DISPL} outperforms a solution monitoring the indicators on the whole image (\emph{Total} in Figure~\ref{fig:ROC}). We also show that image regions have to be adaptively defined on the image content, and that operating on a Voronoi partition of the scene in $K$ regions obtained by clustering $[r(x), c(x)]$ leads to performance loss (\emph{Voronoi} in Figure~\ref{fig:ROC}). For both regions defined as in Section~\ref{subsec:Segmentation} and Voronoi regions, we test the two extreme cases where $\Gamma_l = 1$ and $\Gamma_l = K-1$ (respectively, $\Gamma_d = 1$ and $\Gamma_d = K-1$).
 
-We recorded $8$ sequences from webcams monitoring different urban areas, yielding overall $24410$ frames. From each frame we have cropped the central area, removing the 50 top-most and bottom-most rows, and the 50 left-most and right-most columns. We have synthetically introduced $5\%$ of tampered frames: displacements have been simulated by moving the central cropping area of a random shift having magnitude between 20 and 50 rows and coulumns (as in Figure \ref{fig:sequences}(b)). Blurring was simulated by convolution against a Gaussian kernel (as in Figure \ref{fig:sequences}(a)). \footnote{Sequences can be released upon request.}.
-\gi{Adriano: image sizes? blur kernel std? quanti pixel il displacement?}
+We recorded $8$ sequences from webcams monitoring different urban areas, yielding overall $24410$ frames. From each frame we have cropped the central area, removing the 50 top-most and bottom-most rows, and the 50 left-most and right-most columns. We have synthetically introduced $10\%$ of tampered frames: displacements have been simulated by moving the central cropping area of a random shift having magnitude between 20 and 50 rows and coulumns (as in Figure \ref{fig:sequences}(b)). Blurring was simulated by convolution against a Gaussian kernel (as in Figure \ref{fig:sequences}(a)). \footnote{Sequences can be released upon request.}.
+%\gi{Adriano: image sizes? blur kernel std? quanti pixel il displacement?}
 
 %The second dataset was recorded using a Raspberry Pi Model B+ \cite{raspberry} mounting a camera module. 
 %Few sequences of the first dataset contain real tampering events  (Figure \ref{fig:indicatori}). 
 %In the second dataset, tampering was introduced by moving the device or spraying water on the camera lens. 
 
-The typical figure of merit for assessing detection performance in one-shot monitoring methods are the Receiver-Operating Characteristic (ROC) curves: in our case, these can be computed by varying $\gamma_l$, $\gamma_d$ and $\gamma_g$ in a range of values \gi{quale?}. In particular, each point in the ROC curve report a pair of values (1-SPECIFICITY$_\gamma$, RECALL$_\gamma$) defined as
+The typical figure of merit for assessing detection performance in one-shot monitoring methods are the Receiver-Operating Characteristic (ROC) curves: in our case, these can be computed by varying $\gamma_l$, $\gamma_d$ and $\gamma_g$ in a range of values between $0.1$ and $50$, with step $0.1$. In particular, each point in the ROC curve report a pair of values (1-SPECIFICITY$_\gamma$, RECALL$_\gamma$) defined as
 \[1-\text{SPECIFICITY}_\gamma = \frac{\text{FP}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma}, \ \text{ and } \ \text{RECALL}_\gamma=\frac{\text{TP}_\gamma}{\text{TP}_\gamma+\text{FN}_\gamma}\]
 where TP$_\gamma$ represents the number of true positives (tampered frames correctly detected), FP$_\gamma$ of false positives (tampering-free frames detected), TN$_\gamma$ of true negatives (tampering-free frames not detected) and FN$_\gamma$ of false negatives (missed tampered frames), for a given value of $\gamma$.
 \vspace{-0.3cm}
 \subsubsection{Discussion}
 ROC curves in Figure~\ref{fig:ROC}(a)-(b) and the Area Under the Curve (AUC) values reported in the caption indicate that camera displacements can be effectively detected by all the considered methods; the comparison against Voronoi regions suggests that a more substantial advantage is guaranteed when regions fit the scene content. As far as the values of $\Gamma_l$ and $\Gamma_d $ are concerned, the best option is to raise an alert as soon as a single region provides a very clear outlier (i.e., interval \eqref{eq:confidenceRegions} are quite wide). This option is preferable with respect to requiring $K-1$ regions to simultaneously fire an outlier, because it also enable the detection of partial occlusions of the scene. Overall, the ROC curves confirm that $d$ is a far more effective indicator than $l$ in detecting camera displacements. 
 
-\emph{We observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $0.3\%$ of false alarms, which is half of the whole image solution ($0.7\%$) and less than one third of the Voronoi solution ($1\%$). Having few false alarms is important in a low-power context, considering the high number of frames that have to be processed. Most importantly, false alerts are halved basically at no computational overhead.} \gi{Aggiornare con i nuovi dati}
+\emph{Considering $d$ as indicator, we observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $0.4\%$ of false alarms, with $\gamma = 24.7$, which is less than one fifth of the whole image solution ($2.2\%$ with $\gamma = 4.6$) and the Voronoi solution ($2.3\%$ with $\gamma = 12.9$).
+On the other side, considering $l$ as indicator, we observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $13\%$ of false alarms, with $\gamma = 2.5$, which is about one sixth of the whole image solution ($75\%$ with $\gamma = 0.1$) and about three fifty than the Voronoi solution ($22\%$ with $\gamma = 1.7 $).
+Having few false alarms is important in a low-power context, considering the high number of frames that have to be processed. Most importantly, false alerts are halved basically at no computational overhead.} \gi{Aggiornare con i nuovi dati}
 
 In contrast, Figure~\ref{fig:ROC}(c) confirms that blurring are more effectively detected by monitoring the whole scene at once. This is probably due to the fact that typically, regions $\{R_k\}$ do not include the most prominent edge of the scene, which are indeed the most informative part to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image.\gi{aggiungere commento su K-1 vornoi che va meglio?}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=1\linewidth]{Immagini/curve}
-\caption{\textbf{(a)} ROC curve for displacement detection.
+\caption{\textbf{(a)} ROC curve for displacement detection considering Frame Difference (FD) as indicator.
 	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
-	The AUC corresponding to Algorithm~\ref{alg:DISPL} (Luma-Region) is $99.94\%$, the AUC of Luma-Total is $99.89\%$ the AUC of Luma-Voronoi is $99.85\%$, and the AUC of Frame-Difference is $99.44\%$ (axis have been zoomed for the visualization sake). Large AUC values indicate that these displacements can be successfully detected and that Algorithm~\ref{alg:DISPL} is the most effective one.
-	\textbf{(b)} ROC curve for blurring detection.
-	In this case, the Gradient-Total (AUC $99.96\%$) outperforms the Gradient-Regions (AUC $98.95\%$) because this latter do not include the most prominent edges in images, which are the most important information to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image. 
-	\textbf{TODO} For the visualization sake, these ROC curves have been reported in a limited range of both axis, and in particular we focus on low values of 1-SPECIFICITY, thus of false alarms.
+	The AUC corresponding to Algorithm~\ref{alg:DISPL} ($1$ Region - Algorithm $1$) is $99.89\%$, while the AUC of considering the whole image (Total) is $99.65\%$. 
+	%the AUC of Luma-Voronoi is $99.85\%$, and the AUC of Frame-Difference is $99.44\%$ (axis have been zoomed for the visualization sake). Large AUC values indicate that these displacements can be successfully detected and that Algorithm~\ref{alg:DISPL} is the most effective one.
+	\textbf{(b)} ROC curve for displacement detection considering Luma as indicator.
+	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
+	The AUC corresponding to Algorithm~\ref{alg:DISPL} ($1$ Region - Algorithm $1$) is $98.44\%$, while the AUC of considering the whole image (Total) is $84.07\%$. 
+	\textbf{(c)} ROC curve for blurring detection.
+	In this case, the Gradient-Total (AUC $99.13\%$) outperforms the Gradient-Regions (AUC $98.4\%$) because this latter do not include the most prominent edges in images, which are the most important information to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image. 
+	For the visualization sake, ROC curves \textbf{(a)} and \textbf{(c)} have been reported in a limited range of both axis, and in particular we focus on low values of 1-SPECIFICITY, thus of false alarms.
 	}
 \label{fig:ROC}
 \end{figure}
