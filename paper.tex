@@ -73,7 +73,7 @@ Tampering detection in low-power cameras (eventually organized in wireless senso
 % We here address the problem of detecting tampering events on a camera device that is employed for monitoring purpose. Tampering events can be due to malicious attacks, as for instance a displacement of the camera or spraying some dirty liquid that would prevent the acquisition of (part of) the monitored scene or the interpretation of the content (e.g., the identification of licence plates). 
 
 %What are the key components of my approach and results? Also include any specific limitations.
-We address the detection of camera blurring and displacement (Section \ref{sec:probForm}), and propose an algorithm (Section~\ref{sec:propSol}) that relies on indicators that can be easily computed in low-power smart cameras. We monitor the average image intensity or frame difference (to detect camera displacement), and the average gradient norm (to detect blurring), and consider any frame yielding an outlier as tampered. In particular, we show that separately monitoring these indicators over different regions of the image can substantially improve the displacement-detection performance. Image regions are defined during an initial configuration phase (Section \ref{subsec:Segmentation}), thus the algorithm operates at a negligible computational overhead w.r.t. monitoring the whole image (Section \ref{subsec:coputationalComplexity}). Our algorithm thus represents a prompt trigger, to be possibly combined with other sequential monitoring techniques. Experiments (Section \ref{sec:experiments}) show that leveraging image regions can substantially improve the displacement-detection performance. % Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
+We address the detection of camera blurring and displacement (Section \ref{sec:probForm}), and propose an algorithm (Section~\ref{sec:propSol}) that relies on indicators that can be easily computed in low-power smart cameras. We monitor the average image intensity or frame difference (FD) (to detect camera displacement), and the average gradient norm (to detect blurring), and consider any frame yielding an outlier as tampered. In particular, we show that separately monitoring these indicators over different regions of the image can substantially improve the displacement-detection performance. Image regions are defined during an initial configuration phase (Section \ref{subsec:Segmentation}), thus the algorithm operates at a negligible computational overhead w.r.t. monitoring the whole image (Section \ref{subsec:coputationalComplexity}). Our algorithm thus represents a prompt trigger, to be possibly combined with other sequential monitoring techniques. Experiments (Section \ref{sec:experiments}) show that leveraging image regions can substantially improve the displacement-detection performance. % Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
 
 
 %A low-complexity and sequential monitoring scheme over the average gradient norm is used in~\cite{alippi2010detecting} to detect blurring due to external disturbances on the camera lens.
@@ -243,22 +243,33 @@ Having few false alarms is important in a low-power context, considering the hig
 %\emph{Considering $d$ as indicator, we observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $0.4\%$ of false alarms, with $\gamma = 24.7$, which is less than one fifth of the whole image solution ($2.2\%$ with $\gamma = 4.6$) and the Voronoi solution ($2.3\%$ with $\gamma = 12.9$).
 %On the other side, considering $l$ as indicator, we observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $13\%$ of false alarms, with $\gamma = 2.5$, which is about one sixth of the whole image solution ($75\%$ with $\gamma = 0.1$) and about three fifty than the Voronoi solution ($22\%$ with $\gamma = 1.7 $).
 %Having few false alarms is important in a low-power context, considering the high number of frames that have to be processed. Most importantly, false alerts are halved basically at no computational overhead.} \gi{Aggiornare con i nuovi dati}
-In contrast, Figure~\ref{fig:ROC}(c) confirms that blurring \ad{Giacomo: blurs?} are more effectively detected by monitoring the whole scene at once. This is probably due to the fact that typically, regions $\{R_k\}$ do not include the most prominent edge of the scene, which are indeed the most informative part to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image.%\gi{aggiungere commento su K-1 vornoi che va meglio?}
+In contrast, Figure~\ref{fig:ROC}(c) confirms that blurring is more effectively detected by monitoring the whole scene at once. This is probably due to the fact that typically, regions $\{R_k\}$ do not include the most prominent edge of the scene, which are indeed the most informative part to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image.%\gi{aggiungere commento su K-1 vornoi che va meglio?}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=1\linewidth]{Immagini/curve}
-\caption{\textbf{(a)} ROC curve for displacement detection considering Frame Difference (FD) as indicator.
-	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
-	The AUC corresponding to Algorithm~\ref{alg:DISPL} ($1$ Region - Algorithm $1$) is $99.89\%$, while the AUC of considering the whole image (Total) is $99.65\%$. 
-	%the AUC of Luma-Voronoi is $99.85\%$, and the AUC of Frame-Difference is $99.44\%$ (axis have been zoomed for the visualization sake). Large AUC values indicate that these displacements can be successfully detected and that Algorithm~\ref{alg:DISPL} is the most effective one.
-	\textbf{(b)} ROC curve for displacement detection considering Luma as indicator.
-	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
-	The AUC corresponding to Algorithm~\ref{alg:DISPL} ($1$ Region - Algorithm $1$) is $98.44\%$, while the AUC of considering the whole image (Total) is $84.07\%$. 
-	\textbf{(c)} ROC curve for blurring detection.
-	In this case, the Gradient-Total (AUC $99.13\%$) outperforms the Gradient-Regions (AUC $98.4\%$) because this latter do not include the most prominent edges in images, which are the most important information to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image. 
-	For the visualization sake, ROC curves \textbf{(a)} and \textbf{(c)} have been reported in a limited range of both axis, and in particular we focus on low values of 1-SPECIFICITY, thus of false alarms.
-	}
+\caption{\textbf{(a)} ROC curves relative to displacement detection based on FD: the AUC obtained by 
+"Algo 1 on one region" is $99.89\%$, while the AUC obtained by "Total" (on the whole 
+image) is $99.65\%$.
+\textbf{(b)} ROC curves relative to displacement detection based on Luma: the AUC obtained by 
+"Algo 1 on one region" is $98.44\%$, while the AUC obtained by "Total" (on the whole 
+image) is $84.07\%$.
+\textbf{(c)} ROC curves relative to blurring detection based on Gradient: as opposed to \textbf{(a)} and 
+\textbf{(b)}, "Algo 1 on one region" (AUC $98.4\%$) is outperformed by "Total" (AUC $99.13\%$).
+Note that, in order to highlight the details, the ROC curves are drawn with different 
+scales.}
+%\caption{\textbf{(a)} ROC curve for displacement detection considering Frame Difference (FD) as indicator.
+%	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
+%	The AUC corresponding to Algorithm~\ref{alg:DISPL} ($1$ region - Algorithm $1$) is $99.89\%$, while the AUC of considering the whole image (Total) is $99.65\%$. 
+%	%the AUC of Luma-Voronoi is $99.85\%$, and the AUC of Frame-Difference is $99.44\%$ (axis have been zoomed for the visualization sake). Large AUC values indicate that these displacements can be successfully detected and that Algorithm~\ref{alg:DISPL} is the most effective one.
+%	\textbf{(b)} ROC curve for displacement detection considering Luma as indicator.
+%	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
+%	The AUC corresponding to Algorithm~\ref{alg:DISPL} ($1$ region - Algorithm $1$) is $98.44\%$, while the AUC of considering the whole image (Total) is $84.07\%$. 
+%	\textbf{(c)} ROC curve for blurring detection.
+%	In this case, the Gradient-Total (AUC $99.13\%$) outperforms the Gradient-Regions (AUC $98.4\%$) because this latter do not include the most prominent edges in images, which are the most important information to detect blurring. %This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image. 
+%	ROC curves \textbf{(a)} and \textbf{(c)}
+%	%For the visualization sake, ROC curves \textbf{(a)} and \textbf{(c)} have been reported in a limited range of both axis, and in particular we focus on low values of 1-SPECIFICITY, thus of false alarms.
+	%}
 \label{fig:ROC}
 \end{figure}
 %\begin{figure}[htb]
