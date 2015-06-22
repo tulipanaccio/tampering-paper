@@ -116,7 +116,7 @@ w_t(x) + \eta(x) & \mbox{per} & t \geqslant T^*
 \end{equation}
 where $w_t$ and $y_t$ refer to different viewpoints and/or camera orientations.
 
-The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t\}_t$ to detect the time instant $\tau^*$ when tampering like \eqref{eq:model_defocus} or \eqref{eq:model_displacement} occurs. We assume that $T_0$ tampering-free frames are provided for training.
+The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t, t=1,\dots\}$ to detect the time instant $\tau^*$ when tampering like \eqref{eq:model_defocus} or \eqref{eq:model_displacement} occurs. We assume that $T_0$ tampering-free frames are provided for training.
 
 \begin{figure}[t]
 \centering
@@ -219,7 +219,7 @@ Finally, morphological image-processing operations are executed to remove bounda
 
 \subsection{Computational Complexity}\label{subsec:coputationalComplexity}
 
-The most computationally demanding operations of Algorithm \ref{alg:DISPL} consist in computing of the indicators, in particular $g$. Computing $g$ requires, when using the Sobel filters in~\eqref{eq:normaGradiente}, $34$ operations per pixels\footnote{Execution can be accelerated whether hardware implementations of the FFT transform are available}, while computing $l$ and $d$ requires 1 and 3 operations per pixel, respectively. Detecting outliers in the indicators requires two comparisons per frame: thus, monitoring regions instead of the whole image has a negligible impact on the overall computational complexity. Algorithm~\ref{alg:DISPL} has very low memory requirements: $l$ and $g$ indicators can be computed online, while $d$ requires to store a single frame in memory. Segmentation is executed only during the initial configuration and can be performed on an external device connected to the smart camera. As such, Algorithm~\ref{alg:DISPL} can be properly executed on low-power and ultra low-power cameras.
+The most computationally demanding operations of Algorithm \ref{alg:DISPL} consist in computing the indicators, in particular $g$. Computing $g$ requires, when using the Sobel filters in~\eqref{eq:normaGradiente}, $34$ operations per pixels\footnote{Execution can be accelerated whether hardware implementations of the FFT transform are available}, while computing $l$ and $d$ requires 1 and 3 operations per pixel, respectively. Detecting outliers in the indicators requires two comparisons per frame: thus, monitoring regions instead of the whole image has a negligible impact on the overall computational complexity. Algorithm~\ref{alg:DISPL} has very low memory requirements: $l$ and $g$ indicators can be computed online, while $d$ requires to store a single frame in memory. Segmentation is executed only during the initial configuration and can be performed on an external device connected to the smart camera. As such, Algorithm~\ref{alg:DISPL} can be properly executed on low-power and ultra low-power cameras.
 %\gi{Adriano: inserisci qui l'algoritmo e traducilo in inglese. Se riusciamo lo spostiamo prima di tutte le sottosezioni}
 \vspace{-0.2cm}
 \section{Experiments}\label{sec:experiments}
