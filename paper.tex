@@ -73,7 +73,7 @@ Tampering detection in low-power cameras (eventually organized in wireless senso
 % We here address the problem of detecting tampering events on a camera device that is employed for monitoring purpose. Tampering events can be due to malicious attacks, as for instance a displacement of the camera or spraying some dirty liquid that would prevent the acquisition of (part of) the monitored scene or the interpretation of the content (e.g., the identification of licence plates). 
 
 %What are the key components of my approach and results? Also include any specific limitations.
-We address the detection of camera blurring and displacement (Section \ref{sec:probForm}), and propose an algorithm (Section~\ref{sec:propSol}) that relies on indicators that can be easily computed in low-power smart cameras. We monitor the average image intensity or frame difference (FD) (to detect camera displacement), and the average gradient norm (to detect blurring), and consider any frame yielding an outlier as tampered. In particular, we show that separately monitoring these indicators over different regions of the image can substantially improve the displacement-detection performance. Image regions are defined during an initial configuration phase (Section \ref{subsec:Segmentation}), thus the algorithm operates at a negligible computational overhead w.r.t. monitoring the whole image (Section \ref{subsec:coputationalComplexity}). Our algorithm thus represents a prompt trigger, to be possibly combined with other sequential monitoring techniques. Experiments (Section \ref{sec:experiments}) show that leveraging image regions can substantially improve the displacement-detection performance. % Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
+We address the detection of camera blurring and displacement (Section \ref{sec:probForm}), and propose an algorithm (Section~\ref{sec:propSol}) that relies on indicators that can be easily computed in low-power smart cameras. We monitor the average image intensity or frame difference (to detect camera displacement), and the average gradient norm (to detect blurring), and detect tampered frames by analyzing outliers in these indicators. In particular, we show that separately monitoring these indicators over different regions of the image can substantially improve the displacement-detection performance. Image regions are defined during an initial configuration phase (Section \ref{subsec:Segmentation}), thus the algorithm operates at a negligible computational overhead with respect to monitoring the whole image (Section \ref{subsec:coputationalComplexity}). Our algorithm thus represents a prompt trigger, to be possibly combined with other sequential monitoring techniques. Experiments (Section \ref{sec:experiments}) show that leveraging image regions can substantially improve the displacement-detection performance. % Concluding remarks and discussions are given in Section \ref{sec:Conclusion}.
 
 
 %A low-complexity and sequential monitoring scheme over the average gradient norm is used in~\cite{alippi2010detecting} to detect blurring due to external disturbances on the camera lens.
@@ -129,7 +129,7 @@ The proposed tampering-detection algorithm analyzes a sequence of frames $\{z_t,
 
 Algorithm~\ref{alg:DISPL} presents the proposed tampering detection, which relies on simple indicators such as the average intensity (the \emph{luma}, denoted by $l$), the average frame difference (denoted by $d$) and the average norm of the gradient (denoted by $g$). The first two are meant to detect camera displacements, which would substantially change the image content, while the latter the blurring, which would cause a drop of the energy in the high-frequencies. As anticipated in Section~\ref{sec:introduction}, during the initial configuration, the scene is segmented in $K$ disjoint regions $\{R_k, k = 1,\dots,K\}$, namely $R_k \subset \mathcal{X}, R_i \cap R_j = \emptyset, \forall i \neq j$. The employed segmentation is detailed in Section~\ref{subsec:Segmentation}. 
 
-For each $z_t$, we compute the luma and frame difference separately on each of the $K$ regions,
+For each $z_t$, we compute the luma and frame difference (FD) separately on each of the $K$ regions,
 \begin{eqnarray}
 \vspace{-0.5cm}
 l_k(t) &=& \frac{1}{\#R_k} \sum_{x \in R_k} z_t(x) \label{eq:lumaRegions}\\
@@ -225,13 +225,13 @@ The most computationally demanding operations of Algorithm \ref{alg:DISPL} consi
 \section{Experiments}\label{sec:experiments}
 Experiments are meant to assess the advantages of separately monitoring regions in the considered tampering-detection framework. To this purpose, we show that Algorithm~\ref{alg:DISPL} detects camera displacements better than monitoring indicators on the whole image (\emph{Whole Image} in Figure~\ref{fig:ROC}). We also show that it is important to define regions considering the scene content, since operating on $K$ regions obtained by clustering $[r(x), c(x)]$ leads to performance loss (\emph{Voronoi} in Figure~\ref{fig:ROC}). For both Voronoi and regions defined as in Section~\ref{subsec:Segmentation}, we consider the two extreme configurations where alerts are raised at the first region firing an outlier or when $K-1$ regions simultaneously fire outliers.
 
-We recorded $8$ sequences from webcams monitoring different urban areas, yielding overall $24410$ frames. From each frame we have cropped the central area, removing the 50 top-most and bottom-most rows, and the 50 left-most and right-most columns\footnote{Sequences can be provided upon request.}. We have synthetically introduced $5\%$ of tampered frames: displacements have been simulated by moving the central cropping area of a random shift having magnitude between 20 and 50 rows and coulumns (as in Figure \ref{fig:sequences}(b)). Blurring  (as in Figure \ref{fig:sequences}(a)) was simulated by convolution against a Gaussian kernel, with $1\leq\sigma\leq5$ randomly defined. 
+We recorded $8$ sequences from webcams monitoring different urban areas, yielding overall $12200$ frames. From each frame we have cropped the central area, removing the 50 top-most and bottom-most rows, and the 50 left-most and right-most columns\footnote{Sequences can be provided upon request.}. We have synthetically introduced $10\%$ of tampered frames: displacements have been simulated by moving the central cropping area of a random shift having magnitude between 20 and 50 rows and coulumns (as in Figure \ref{fig:sequences}(b)). Blurring  (as in Figure \ref{fig:sequences}(a)) was simulated by convolution against a Gaussian kernel, with $1\leq\sigma\leq5$ randomly defined. 
 %\gi{Adriano: image sizes? blur kernel std? quanti pixel il displacement?}
 %The second dataset was recorded using a Raspberry Pi Model B+ \cite{raspberry} mounting a camera module. 
 %Few sequences of the first dataset contain real tampering events  (Figure \ref{fig:indicatori}). 
 %In the second dataset, tampering was introduced by moving the device or spraying water on the camera lens. 
 
-A typical figure of merit for assessing detection performance is the Receiver-Operating Characteristic (ROC) curve, where each point corresponds to a pair (FPR$_\gamma$, TPR$_\gamma$) defined as
+A typical figure of merit for assessing detection performance is the Receiver Operating Characteristic (ROC) curve, where each point corresponds to a pair (FPR$_\gamma$, TPR$_\gamma$) defined as
 %
 \[\text{FPR}_\gamma = \frac{\text{FP}_\gamma}{\text{TN}_\gamma+\text{FP}_\gamma}, \ \text{ and } \ \text{TPR}_\gamma=\frac{\text{TP}_\gamma}{\text{TP}_\gamma+\text{FN}_\gamma}.\]
 %
@@ -245,18 +245,18 @@ ROC curves in Figure~\ref{fig:ROC}(a)-(b) and the Area Under the Curve (AUC) val
 %On the other side, considering $l$ as indicator, we observe that to achieve a recall of $98\%$, Algorithm~\ref{alg:DISPL} operates at $13\%$ of false alarms, with $\gamma = 2.5$, which is about one sixth of the whole image solution ($75\%$ with $\gamma = 0.1$) and about three fifty than the Voronoi solution ($22\%$ with $\gamma = 1.7 $).
 %Having few false alarms is important in a low-power context, considering the high number of frames that have to be processed. Most importantly, false alerts are halved basically at no computational overhead.} \gi{Aggiornare con i nuovi dati}
 Figure~\ref{fig:ROC}(c) confirms that blurring is more effectively detected by monitoring the whole image at once. This is probably due to the fact that, typically, regions do not include the most prominent edge of the scene, which are indeed the most informative parts to detect blurring. This is the reason why, in Algorithm~\ref{alg:DISPL}, $g$ is monitored on the whole image.%\gi{aggiungere commento su K-1 vornoi che va meglio?}
-
+x
 \begin{figure}[t]
 \centering
 \includegraphics[width=1\linewidth]{Immagini/curve}
 \caption{\textbf{(a)} ROC curves relative to displacement detection based on FD: the AUC obtained by 
-``One region - Algorithm 1'' is $99.89\%$, while the AUC obtained by ``Total'' (on the whole 
-image) is $99.65\%$.
-\textbf{(b)} ROC curves relative to displacement detection based on Luma: the AUC obtained by 
-``One region - Algorithm 1'' is $98.44\%$, while the AUC obtained by ``Total'' (on the whole 
-image) is $84.07\%$.
-\textbf{(c)} ROC curves relative to blurring detection based on Gradient: as opposed to \textbf{(a)} and 
-\textbf{(b)}, ``One region - Algorithm 1'' (AUC $98.4\%$) is outperformed by ``Total'' (AUC $99.13\%$).
+``Algorithm 1 - One region'' is $99.89\%$, while the AUC obtained by on the whole 
+image is $99.65\%$.
+\textbf{(b)} ROC curves relative to displacement detection based on luma: the AUC obtained by 
+``Algorithm 1 - One region'' is $98.44\%$, while the AUC obtained on the whole 
+image is $84.07\%$.
+\textbf{(c)} ROC curves relative to blurring detection based on gradient: as opposed to \textbf{(a)} and 
+\textbf{(b)}, ``Algorithm 1 - One region'' (AUC $98.4\%$) is outperformed by monitoring the whole image, AUC = $99.13\%$.
 To highlight differences, the ROC curves in \textbf{(a)} and \textbf{(c)} are drawn over a smaller FPR, TPR range.}
 %\caption{\textbf{(a)} ROC curve for displacement detection considering Frame Difference (FD) as indicator.
 %	%There is an improvement in the performance considering adaptive regions w.r.t. considering the whole image or Voronoi regions.
